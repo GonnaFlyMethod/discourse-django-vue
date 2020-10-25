@@ -1,11 +1,12 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
-from models import CustomAccountManager
+from .managers.account_manager import CustomAccountManager
 
 
 class Account(AbstractBaseUser, PermissionsMixin):
-	COUNTRIES = [("BY", "Belarus")]
+    COUNTRIES = [("BY", "Belarus")]
 
     SEX_CHOICES = [
         ("M", "Male"),
@@ -44,4 +45,3 @@ class Account(AbstractBaseUser, PermissionsMixin):
         """Helps to find out the age of a user according to his date of
         birth."""
         return int((datetime.date.today() - self.date_of_birth).days / 365.25)
-
