@@ -11,7 +11,7 @@ urlpatterns = [
 ]
 
 rest_api_urls = [
-    re_path(r'api/get-countries/(?P<operation>)(sign-up)/?',
+    re_path(r'api/get-countries/?',
             views.GetCountriesAPI.as_view(), name='get-countries')
 ]
 

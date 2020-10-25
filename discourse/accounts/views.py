@@ -18,7 +18,7 @@ class SignUpFormView(View):
 
 class GetCountriesAPI(APIView):
 
-    def get(self, request, operation):
+    def get(self, request):
         countries = Country.objects.all()
         serializer = CountriesSerializer(countries, many=True)
         return Response(serializer.data)

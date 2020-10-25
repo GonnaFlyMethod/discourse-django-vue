@@ -1,84 +1,88 @@
+{% extends 'base.html' %}
+
 <!-- loading static -->
+
+
+{% block static %}
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/sign_up.css' %}">
 
 <!-- loading of other resources -->
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
+{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<body>
+{% block html %}
 <div class="container">
-      <div class="col-md-6 mx-auto text-center">
-         <div class="header-title">
+    <div class="col-md-6 mx-auto text-center">
+        <div class="header-title">
             <h1 class="wv-heading--title">
                Discourse - Sign Up
             </h1>
             <h2 class="wv-heading--subtitle">
                Discuss different topics with the whole world!
             </h2>
-         </div>
-      </div>
-      <div class="row">
-         <div class="col-md-4 mx-auto">
-            <div class="myform form ">
-               <form action="" method="post" name="login">
-                {% csrf_token %}
-                  <div class="form-group">
-                    <input type="text" name="first_name"  class="form-control my-input" id="first_name" placeholder="First name">
-                  </div>
-                  <div class="form-group">
-                    <input type="text" name="second_name"  class="form-control my-input" id="name" placeholder="Second name">
-                  </div>
-                  <div class="form-group">
-                     <input type="email" name="email"  class="form-control my-input" id="email" placeholder="Email">
-                  </div>
-                  <div class="form-group">
-                     <select name="country", class="form-control my-input", id="country_list", placeholder="Country">
-                        <option v-for="country in countriest" id='countries_list'>
-                            {{  }}
-                        </option>
-                     </select>
-                  </div>
-                  <div class="text-center ">
-                     <button type="submit" class=" btn btn-block send-button tx-tfm">Sign Up</button>
-                  </div>
-                  <div class="col-md-12 ">
-                     <div class="login-or">
-                        <hr class="hr-or">
-                        <span class="span-or">or</span>
-                     </div>
-                  </div>
-                  <div class="form-group">
-                     <a class="btn btn-block g-button" href="#">
-                     <i class="fa fa-google"></i> Sign up with Google
-                     </a>
-                  </div>
-                  <p class="small mt-3">By signing up, you are indicating that you have read and agree to the <a href="#" class="ps-hero__content__link">Terms of Use</a> and <a href="#">Privacy Policy</a>.
-                  </p>
-               </form>
+        </div>
+    </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto">
+                <div class="myform form ">
+                    <form action="" method="post" name="login">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type="text" name="first_name"  class="form-control my-input" id="first_name" placeholder="First name">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="second_name"  class="form-control my-input" id="name" placeholder="Second name">
+                        </div>
+                        <div class="form-group">
+                            <input type="email" name="email"  class="form-control my-input" id="email" placeholder="Email">
+                        </div>
+                        <div class="form-group">
+                            <select name="country" class="form-control my-input" id="country_list_select" placeholder="Country">
+                                <option v-for="country in countries_list" v-bind:value="country.name"id='countries_list'> {% verbatim %} {{ country.name }} {% endverbatim %}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="text-center ">
+                            <button type="submit" class=" btn btn-block send-button tx-tfm">Sign Up</button>
+                        </div>
+                        <div class="col-md-12 ">
+                            <div class="login-or">
+                                <hr class="hr-or">
+                                <span class="span-or">or</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <a class="btn btn-block g-button" href="#">
+                                <i class="fa fa-google"></i> Sign up with Google
+                            </a>
+                        </div>
+                        <p class="small mt-3">By signing up, you are indicating that you have read and agree to the <a href="#" class="ps-hero__content__link">Terms of Use</a> and <a href="#">Privacy Policy</a>.
+                        </p>
+                    </form>
+                </div>
             </div>
-         </div>
-      </div>
-   </div>
-</body>
-
-</html>
+        </div>
+</div>
 
 <script type="text/javascript">
     
-    new Vue({
-        el: '#country_list',
-        data () {
-            countries_list: null;
+    vm = new Vue({
+        el: '#country_list_select',
+        data() {
+            return {
+                countries_list: null
+            }
         },
-        mounted () {
-            axios.get('https://api.coindesk.com/v1/bpi/currentprice.json').then(response => (this.countries_list = response))
-        }
+        mounted() {
+            axios.get("{% url 'accounts:get-countries' %}", {
+            }).then(response => (this.countries_list = JSON.parse(JSON.stringify(response.data))))
+        },
     })
-
 </script>
+
+{% endblock %}
