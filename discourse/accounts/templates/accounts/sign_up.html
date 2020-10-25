@@ -80,7 +80,7 @@
         },
         mounted() {
             axios.get("{% url 'accounts:get-countries' %}", {
-            }).then(response => (this.countries_list = JSON.parse(JSON.stringify(response.data))))
+            }).then(response => (this.countries_list = response.data))
         },
     })
 </script>
