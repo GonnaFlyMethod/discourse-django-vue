@@ -64,6 +64,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core_settings.wsgi.application'
 
+REST_FRAMEWORK = {
+    # Only enable JSON renderer by default.
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
