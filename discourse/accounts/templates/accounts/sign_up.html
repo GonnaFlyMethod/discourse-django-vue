@@ -30,7 +30,7 @@
         <div class="row">
             <div class="col-md-4 mx-auto">
                 <div class="myform form ">
-                    <form action="" method="post" name="login">
+                    <form method="post" id='form' @submit.prevent='submit()'>
                         {% csrf_token %}
                         <div class="form-group">
                             <input type="text" name="first_name"  class="form-control my-input" id="first_name" placeholder="First name">
@@ -42,13 +42,31 @@
                             <input type="email" name="email"  class="form-control my-input" id="email" placeholder="Email">
                         </div>
                         <div class="form-group">
+                            <input type="date" id="date" name="date_of_birth" class="form-control my-input" placeholder="Date of birth">
+                        </div>
+                        <div class="form-group">
                             <select name="country" class="form-control my-input" id="country_list_select" placeholder="Country">
-                                <option v-for="country in countries_list" v-bind:value="country.name"id='countries_list'> {% verbatim %} {{ country.name }} {% endverbatim %}
+                                <option value="" disabled selected hidden>Choose the country where are you from</option>
+                                <option v-for="country in countries_list" id='countries_list' v-cloak> {% verbatim %} {{ country.name }} {% endverbatim %}
                                 </option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <select name="sex" class="form-control my-input" id="sex_select">
+                                <option value="" disabled selected hidden>Choose your sex</option>
+                                <option id='male_sex_select'> Male </option>
+                                <option id='female_sex_select'> Female </option>
+                                <option id='other_sex_select'> Other </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" placeholder="Password" class="form-control my-input" name="password">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" placeholder="Confirm password" class="form-control my-input" name="password2">
+                        </div>
                         <div class="text-center ">
-                            <button type="submit" class=" btn btn-block send-button tx-tfm">Sign Up</button>
+                            <input type="submit" class=" btn btn-block send-button tx-tfm" name="Sign Up">
                         </div>
                         <div class="col-md-12 ">
                             <div class="login-or">
@@ -70,8 +88,8 @@
 </div>
 
 <script type="text/javascript">
-    
-    vm = new Vue({
+
+    let vm = new Vue({
         el: '#country_list_select',
         data() {
             return {
@@ -82,7 +100,15 @@
             axios.get("{% url 'accounts:get-countries' %}", {
             }).then(response => (this.countries_list = response.data))
         },
-    })
+        methods: {
+            submit: function(){
+                axios.post("{% url 'accounts:sign-up' %}").then(function(response){
+                    console.log(response.data)
+                })
+            }
+        }
+    });
+
 </script>
 
 {% endblock %}

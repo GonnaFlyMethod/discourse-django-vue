@@ -13,17 +13,11 @@ class Country(models.Model):
 
 
 class Account(AbstractBaseUser, PermissionsMixin):
-
-    SEX_CHOICES = [
-        ("M", "Male"),
-        ("F", "Female"),
-    ]
-
     first_name = models.CharField("First name", max_length=15)
     second_name = models.CharField("Second name", max_length=15)
     email = models.EmailField("E-mail", unique=True)
     date_of_birth = models.DateField("Date of birth")
-    sex = models.CharField("Sex", max_length=2, choices=SEX_CHOICES)
+    sex = models.CharField("Sex", max_length=20)
 
     date_joined = models.DateTimeField(verbose_name="Date joined",
                                        default=timezone.now)
