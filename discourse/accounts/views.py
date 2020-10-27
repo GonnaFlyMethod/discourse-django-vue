@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.views import View
 from rest_framework import generics
 from rest_framework.decorators import api_view
@@ -25,10 +26,10 @@ class SignUpFormView(APIView):
 		data = {}
 		if serializer.is_valid():
 			account = serializer.save()
-			data['response'] = 'OK'
+			return HttpResponseRedirect(reverse('discourse:index'))
 		else:
 			data = serializer.errors
-		return JsonResponse(data)
+		return Response(data)
 
 
 class GetCountriesAPI(APIView):

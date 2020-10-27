@@ -26,6 +26,7 @@ AUTH_USER_MODEL = 'accounts.Account'
 
 INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
+    'discourse.apps.DiscourseConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -66,6 +67,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core_settings.wsgi.application'
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
     # Only enable JSON renderer by default.
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',

@@ -30,7 +30,7 @@
         <div class="row">
             <div class="col-md-4 mx-auto">
                 <div class="myform form ">
-                    <form method="post" id='form' @submit.prevent='submit()'>
+                    <form method="post" id='post_form'>
                         {% csrf_token %}
                         <div class="form-group">
                             <input type="text" name="first_name"  class="form-control my-input" id="first_name" placeholder="First name">
@@ -91,7 +91,7 @@
 
     let vm = new Vue({
         el: '#country_list_select',
-        data() {
+        data () {
             return {
                 countries_list: null
             }
@@ -100,13 +100,6 @@
             axios.get("{% url 'accounts:get-countries' %}", {
             }).then(response => (this.countries_list = response.data))
         },
-        methods: {
-            submit: function(){
-                axios.post("{% url 'accounts:sign-up' %}").then(function(response){
-                    console.log(response.data)
-                })
-            }
-        }
     });
 
 </script>
