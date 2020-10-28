@@ -7,7 +7,7 @@ class TopicsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Topic
-        exclude = ['timestamp',]
+        fields = '__all__'
 
 
 class CommentToTopicSerializer(serializers.ModelSerializer):
