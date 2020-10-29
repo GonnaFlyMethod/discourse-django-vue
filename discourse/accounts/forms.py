@@ -25,13 +25,13 @@ class CreateUser(UserCreationForm):
                                              'class': 'form-control my-input',
                                              'id': 'second_name',
                                              'placeholder': 'Second name'}))
-        second_name = forms.CharField(max_length=50,
-                                     widget= forms.TextInput
-                                     (attrs={'type':'text',
-                                             'name':'second_name',
-                                             'class': 'form-control my-input',
-                                             'id': 'second_name',
-                                             'placeholder': 'Second name'}))
+        email = forms.EmailField(max_length=300,
+                                       widget= forms.TextInput
+                                       (attrs={'type':'email',
+                                               'name':'second_name',
+                                               'class': 'form-control my-input',
+                                               'id': 'email',
+                                               'placeholder': 'Second name'}))
 
         fields = ['first_name', 'second_name', 'email', 'sex', 'date_of_birth',
                   'country',

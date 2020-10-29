@@ -1,9 +1,13 @@
+import accounts.models
+
+
 def create_acc(user_obj, arguments: dict, manager_obj, user="common_user"):
     """Depending on the value 'user' argument creates a certain type of user."""
     user_obj.first_name = arguments["first_name"]
     user_obj.second_name = arguments["second_name"]
     user_obj.sex = arguments["sex"]
-    user_obj.country = arguments["country"]
+    country_id = int(arguments["country"])
+    user_obj.country = accounts.models.Country.objects.get(id=country_id)
     user_obj.date_of_birth = arguments["date_of_birth"]
 
     if user == "common_user":

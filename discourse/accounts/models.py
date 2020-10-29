@@ -18,6 +18,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField("E-mail", unique=True)
     date_of_birth = models.DateField("Date of birth")
     sex = models.CharField("Sex", max_length=20)
+    country = models.ForeignKey("accounts.Country", on_delete=models.CASCADE)
 
     date_joined = models.DateTimeField(verbose_name="Date joined",
                                        default=timezone.now)

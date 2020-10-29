@@ -3,6 +3,7 @@ import calendar
 
 from django.views import View
 from django.shortcuts import render
+from django.urls import reverse
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -36,5 +37,23 @@ class GetTopicsApi(APIView):
 			month = dict_['timestamp'][month_start:month_end]
 			dict_['timestamp'] = new_timestamp
 			dict_['month'] = calendar.month_abbr[int(month)]
-		print(data_to_display)
+			topic_id = int(dict_['id'])
+			dict_['url'] = reverse('discourse:topic-detail',
+				                   kwargs={'topicID':topic_id,'type_': 'api'})
 		return Response(data_to_display)
+
+
+class TopicDetail(APIView):
+
+	def get(self, request, topicID, type_):
+		topic = Topic.objects.get(id=topicID)
+		topic_info = TopicsSerializer(topic)
+		if type_ == 'get':
+			context = {'topic_inf': topic}
+			return render(request, 'discourse/topic_detail.html', context)
+		elif type_ == 'topic_info':
+			return Response(topic_info.data)
+		else:
+			comments = topic_info.get_comments(topic)
+			return Response(comments)
+			
