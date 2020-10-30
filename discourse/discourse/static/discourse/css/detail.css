@@ -28,3 +28,18 @@ ul.timeline > li:before {
     height: 20px;
     z-index: 400;
 }
+
+#sep{
+    padding-top:5%;
+}
+
+#comment-field{
+    padding-top: 2%;
+    text-align: center;
+}
+
+#submit_button{
+    padding-top: 1%;
+    float:center;
+    height: 38px;
+}

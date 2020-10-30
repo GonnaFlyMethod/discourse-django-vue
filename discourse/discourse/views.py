@@ -49,8 +49,12 @@ class TopicDetail(APIView):
 		topic = Topic.objects.get(id=topicID)
 		topic_info = TopicsSerializer(topic)
 		if type_ == 'get':
-			context = {'topic_inf': topic}
-			return render(request, 'discourse/topic_detail.html', context)
+			info = reverse('discourse:topic-detail',
+				           kwargs={'topicID': topic.id, 'type_':'topic_info'})
+			comments = reverse('discourse:topic-detail',
+				           kwargs={'topicID': topic.id, 'type_':'comments'})
+			context = {'topic_inf': topic, 'info':info,'comments': comments}
+			return render(request, 'discourse/detail.html', context)
 		elif type_ == 'topic_info':
 			return Response(topic_info.data)
 		else:
