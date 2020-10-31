@@ -28,8 +28,9 @@
                 <hr>
             </div>
             <div id='comment-field'>
-                <form>
-                    <textarea class="form-control"></textarea>
+                <form id='send_comment_form' method="post" @submit.prevent="onSubmit($data)">
+                    {% csrf_token %}
+                    <textarea class="form-control" name='text' id='text' v-model="text"></textarea>
                     <div id='submit_button'>
                         <input type='submit' id='submit_button' value='Post'class="btn btn-dark">
                     </div>
@@ -45,16 +46,36 @@
 <script type="text/javascript">
     topic_info_api = '{{ info }}'
     comments_api = '{{ comments}}'
+    send_comment_api = '{{ send_comment_link }}'
     vm = new Vue({
         delimiters: ["[[", "]]"],
         el: '#timeline-discourse',
         data:{
             topic: null,
-            comments: null
+            comments: null,
+            text: null
         },
         mounted(){
             axios.get(topic_info_api).then(response => (this.topic = response.data))
             axios.get(comments_api).then(response => (this.comments = response.data))
+        },
+        methods:{
+            onSubmit: function() {
+                new_comments = $.ajax({
+                    type: "POST",
+                    url: send_comment_api,
+                    data: {"text": this.text , 'csrfmiddlewaretoken': '{{ csrf_token }}', },
+                    dataType: 'json',
+                    success: function(data){
+                        if (data.status === 'OK'){
+                            res = axios.get(comments_api).then(function(){
+                                return response.data
+                            })
+                        return res
+                        }
+                    }
+                })
+            }
         }
 
     })    

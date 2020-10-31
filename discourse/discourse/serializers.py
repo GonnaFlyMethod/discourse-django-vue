@@ -18,3 +18,12 @@ class TopicsSerializer(serializers.ModelSerializer):
     def get_comments(self, obj):
     	return CommentToTopicSerializer(obj.topic_comments.all(),
     		                            many=True).data
+
+
+class PostCommentSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Comment
+		fields = '__all__'
+
+
+

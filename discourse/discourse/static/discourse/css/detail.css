@@ -38,6 +38,9 @@ ul.timeline > li:before {
     text-align: center;
 }
 
+#jump_into_into_topic_icon_h{
+    display: inline;
+}
 #submit_button{
     padding-top: 1%;
     float:center;

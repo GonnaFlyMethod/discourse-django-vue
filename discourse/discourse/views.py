@@ -4,13 +4,19 @@ import calendar
 from django.views import View
 from django.shortcuts import render
 from django.urls import reverse
+from django.http import HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
-from .serializers import TopicsSerializer, CommentToTopicSerializer
+from accounts.models import Account
 
-from .models import Topic
+from .serializers import (TopicsSerializer, CommentToTopicSerializer,
+	                      PostCommentSerializer)
+
+from .models import Topic, Comment
 
 
 class MainPageView(View):
@@ -39,7 +45,7 @@ class GetTopicsApi(APIView):
 			dict_['month'] = calendar.month_abbr[int(month)]
 			topic_id = int(dict_['id'])
 			dict_['url'] = reverse('discourse:topic-detail',
-				                   kwargs={'topicID':topic_id,'type_': 'api'})
+				                   kwargs={'topicID':topic_id,'type_': 'get'})
 		return Response(data_to_display)
 
 
@@ -53,11 +59,33 @@ class TopicDetail(APIView):
 				           kwargs={'topicID': topic.id, 'type_':'topic_info'})
 			comments = reverse('discourse:topic-detail',
 				           kwargs={'topicID': topic.id, 'type_':'comments'})
-			context = {'topic_inf': topic, 'info':info,'comments': comments}
+			send_comment_link = reverse('discourse:post-comment',
+				                   kwargs={'topicID': topic.id}) 
+			context = {'topic': topic, 'info':info,'comments': comments,
+			           'send_comment_link': send_comment_link}
 			return render(request, 'discourse/detail.html', context)
 		elif type_ == 'topic_info':
 			return Response(topic_info.data)
 		else:
 			comments = topic_info.get_comments(topic)
 			return Response(comments)
-			
+
+
+
+class PostCommentAPI(APIView):
+
+	def post(self, request, topicID):
+		if request.user.is_authenticated:
+			account = Account.objects.get(id=request.user.id)
+			topic = Topic.objects.get(id=topicID)
+			serializer = PostCommentSerializer(data=request.data)
+
+			if serializer.is_valid():
+				serializer.validated_data['author'] = account
+				serializer.validated_data['to_topic'] = topic
+				serializer.save()
+				return Response({'status':'OK'})
+			else:
+				return Response(serializer.errors)
+		else:
+			return HttpResponseBadRequest()

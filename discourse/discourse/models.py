@@ -14,9 +14,11 @@ class Topic(models.Model):
 
 
 class Comment(models.Model):
-	author = models.ForeignKey(Account, on_delete=models.CASCADE)
+	author = models.ForeignKey(Account, on_delete=models.CASCADE, blank=True,
+		                       null=True)
 	to_topic = models.ForeignKey(Topic, related_name='topic_comments',
-		                         on_delete=models.CASCADE)
+		                         on_delete=models.CASCADE, blank=True,
+		                         null=True)
 	text = models.TextField(blank=False, null=False)
 	timestamp = models.DateTimeField(auto_now_add=True)
 

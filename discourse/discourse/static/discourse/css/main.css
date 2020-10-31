@@ -100,30 +100,14 @@
 		color: rgb(30, 30, 30);
 		background-color: rgb(200, 200, 200);
 	}
-	.facebook a,
-	.twitter a,
-	.google-plus a {
+	.jump_button a {
 		display: block;
 		width: 100%;
 		color: rgb(75, 110, 168) !important;
 	}
-	.twitter a {
-		color: rgb(79, 213, 248) !important;
-	}
-	.google-plus a {
-		color: rgb(221, 75, 57) !important;
-	}
-	.facebook:hover a {
+	.jump_button:hover a {
 		color: rgb(255, 255, 255) !important;
 		background-color: rgb(75, 110, 168) !important;
-	}
-	.twitter:hover a {
-		color: rgb(255, 255, 255) !important;
-		background-color: rgb(79, 213, 248) !important;
-	}
-	.google-plus:hover a {
-		color: rgb(255, 255, 255) !important;
-		background-color: rgb(221, 75, 57) !important;
 	}
 
 	@media (min-width: 768px) {
@@ -176,9 +160,6 @@
 			display: block;
 			width: 40px;
 		}
-        .event-list > li > .social > ul {
-            border-left: 1px solid rgb(230, 230, 230);
-        }
 		.event-list > li > .social > ul > li {			
 			display: block;
             padding: 0px;
