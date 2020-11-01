@@ -24,6 +24,7 @@
                     <p id='text_of_comments'>[[ comment.text ]]</p>
                 </li>
             </ul>
+            {% if user.is_authenticated %}
             <div id='sep'>
                 <hr>
             </div>
@@ -36,6 +37,7 @@
                     </div>
                 </form>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>
