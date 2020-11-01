@@ -68,7 +68,11 @@ class TopicDetail(APIView):
 			return Response(topic_info.data)
 		else:
 			comments = topic_info.get_comments(topic)
-			return Response(comments)
+			comments_clean = comments
+			for dict_ in comments_clean:
+				time_edge = re.search(r'T', dict_['timestamp'])
+				dict_['timestamp'] = dict_['timestamp'][:time_edge.start()]
+			return Response(comments_clean)
 
 
 

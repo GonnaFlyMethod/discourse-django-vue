@@ -19,20 +19,20 @@
             <h2>[[ topic.topic ]]</h2> 
             <ul class="timeline">
                 <li v-for="comment in comments">
-                    <a target="_blank">[[ comment.author ]]</a>
+                    <a target="_blank"><b>[[ comment.author ]]</b></a>
                     <a href="#" class="float-right">[[ comment.timestamp ]]</a>
-                    <p>[[ comment.text ]]</p>
+                    <p id='text_of_comments'>[[ comment.text ]]</p>
                 </li>
             </ul>
             <div id='sep'>
                 <hr>
             </div>
             <div id='comment-field'>
-                <form id='send_comment_form' method="post" @submit.prevent="onSubmit($data)">
+                <form id='send_comment_form' method="post" @submit.prevent="onSubmit">
                     {% csrf_token %}
                     <textarea class="form-control" name='text' id='text' v-model="text"></textarea>
                     <div id='submit_button'>
-                        <input type='submit' id='submit_button' value='Post'class="btn btn-dark">
+                        <input type='submit' id='submit_button' value='Go'class="btn btn-dark">
                     </div>
                 </form>
             </div>
@@ -63,24 +63,17 @@
             onSubmit: function() {
                 new_comments = $.ajax({
                     type: "POST",
+                    async:false,
                     url: send_comment_api,
                     data: {"text": this.text , 'csrfmiddlewaretoken': '{{ csrf_token }}', },
                     dataType: 'json',
-                    success: function(data){
-                        if (data.status === 'OK'){
-                            res = axios.get(comments_api).then(function(){
-                                return response.data
-                            })
-                        return res
-                        }
-                    }
                 })
+                axios.get(comments_api).then(response => (this.comments = response.data))
+                this.text = ''
             }
         }
 
     })    
-
-
 </script>
 
 {% endblock %}

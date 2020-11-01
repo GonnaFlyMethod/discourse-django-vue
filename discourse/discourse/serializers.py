@@ -4,9 +4,10 @@ from .models import Topic, Comment
 
 
 class CommentToTopicSerializer(serializers.ModelSerializer):
+	author = serializers.SlugRelatedField(slug_field="email", read_only=True)
 	class Meta:
 		model = Comment
-		exclude = ['timestamp',]
+		fields = '__all__'
 
 
 class TopicsSerializer(serializers.ModelSerializer):
@@ -21,6 +22,7 @@ class TopicsSerializer(serializers.ModelSerializer):
 
 
 class PostCommentSerializer(serializers.ModelSerializer):
+
 	class Meta:
 		model = Comment
 		fields = '__all__'
