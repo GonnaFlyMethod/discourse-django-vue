@@ -49,7 +49,7 @@
                             <div class="form-group">
                                 <p style="color: red;" v-show='country_error'>* [[ country_error ]]</p>
                                 <select name="country" class="form-control my-input" id="country_list_select" placeholder="Country" v-model='country'>
-                                    <option value="" disabled selected hidden>Choose the country where are you from</option>
+                                    <option value="H" disabled selected> Choose the country where are you from</option>
                                     <option v-for="country in countries_list" id='countries_list' v-cloak> [[ country.name ]]
                                     </option>
                                 </select>
@@ -57,7 +57,7 @@
                             <div class="form-group">
                                 <p style="color: red;" v-show='sex_error'>* [[ sex_error ]]</p>
                                 <select name="sex" class="form-control my-input" id="sex_select" v-model='sex'>
-                                    <option value="" disabled selected hidden>Choose your sex</option>
+                                    <option value="" disabled selected>Choose your sex</option>
                                     <option id='male_sex_select'> Male </option>
                                     <option id='female_sex_select'> Female </option>
                                     <option id='other_sex_select'> Other </option>

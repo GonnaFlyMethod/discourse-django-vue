@@ -24,9 +24,6 @@ class SignUpSerializer(serializers.ModelSerializer):
 			'password':{'write_only':True}
 		}
 
-	def custom_errors_clean(self):
-		self.custom_errors = {}
-
 	def validate(self, data):
 		if data['password'] != data['password2']:
 			msg = 'Passwords must match'
@@ -57,4 +54,3 @@ class SignUpSerializer(serializers.ModelSerializer):
 		account.set_password(password)
 		account.save()
 		return account
-
