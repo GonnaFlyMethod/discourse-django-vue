@@ -1,3 +1,5 @@
+from datetime import date
+
 from rest_framework import serializers
 
 from .models import Country, Account
@@ -22,6 +24,19 @@ class SignUpSerializer(serializers.ModelSerializer):
 			'password':{'write_only':True}
 		}
 
+	def custom_errors_clean(self):
+		self.custom_errors = {}
+
+	def validate(self, data):
+		if data['password'] != data['password2']:
+			msg = 'Passwords must match'
+			raise serializers.ValidationError({'password2':msg})
+		if data['date_of_birth'] > date.today():
+			msg = 'Are u tring to create an account for your son or daughter' \
+			' :) ?'
+			raise serializers.ValidationError({'date_of_birth': msg})
+		return data
+
 	def save(self):
 		first_name = self.validated_data['first_name']
 		second_name = self.validated_data['second_name']
@@ -38,11 +53,6 @@ class SignUpSerializer(serializers.ModelSerializer):
 			              country=country
         )
 		password = self.validated_data['password']
-		password2 = self.validated_data['password2']
-
-		if password != password2:
-			msg = {'password': 'Passwords must match'}
-			raise serializers.ValidationError(msg)
 
 		account.set_password(password)
 		account.save()
