@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
 from django.views import View
 from rest_framework import generics
@@ -19,11 +19,15 @@ class SignUpFormView(APIView):
 	temlate = 'accounts/sign_up.html'
 
 	def get(self, request):
-		context = {
-			'reg_user_url': reverse('accounts:sign-up'),
-			'success_url': reverse('discourse:main')
-		}
-		return render(request, self.temlate, context)
+
+		if not request.user.is_authenticated:
+			context = {
+				'reg_user_url': reverse('accounts:sign-up'),
+				'success_url': reverse('discourse:main')
+			}
+			return render(request, self.temlate, context)
+		else:
+			return HttpResponseBadRequest()
 
 	def post(self, request):
 		data = request.data
@@ -59,3 +63,34 @@ class GetCountriesAPI(APIView):
         countries = Country.objects.all()
         serializer = CountriesSerializer(countries, many=True)
         return Response(serializer.data)
+
+
+class SignInView(APIView):
+
+	template = 'accounts/sign_in.html'
+
+	def get(self, request):
+
+		if not request.user.is_authenticated:
+			context = {
+				'sign_in_url': reverse('accounts:sign-in')
+			}
+			return render(request, self.template, context)
+		else:
+			return HttpResponseBadRequest()
+
+	def post(self, request):
+		email_of_user = request.data['email']
+		password = request.data['pasword']
+		user = authenticate(email=email_of_user, password=password)
+
+		data = {}
+		if user is not None:
+			if user.is_active:
+				login(request, user)
+				data['status'] = 'OK'
+				return Response(data)
+			else:
+				data['status'] = 'banned'
+		else:
+			data['status'] = 'wrong_email_or_pass'
