@@ -5,7 +5,7 @@
 
 {% block static %}
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/sign_up.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/sign_up_sign_in.css' %}">
 
 <!-- loading of other resources -->
 <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -31,11 +31,10 @@
                         <form method="post" id='post_form' @submit.prevent="onSubmit">
                             {% csrf_token %}
                             <div class="form-group">
-                                <p style="color: red;" v-show='email_error'>* [[ email_error ]]</p>
+                                <p style="color: red;" v-show='sign_in_error'>* [[ sign_in_error ]]</p>
                                 <input type="email" name="email"  class="form-control my-input" id="email" placeholder="Email" v-model='email'>
                             </div>
                             <div class="form-group">
-                                <p style="color: red;" v-show='password_error'>* [[ password_error ]]</p>
                                 <input type="password" placeholder="Password" class="form-control my-input" name="password" v-model='password'>
                             </div>
                             <div class="text-center ">
@@ -48,7 +47,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <a class="btn btn-block g-button" href="#">
+                                <a class="btn btn-block g-button" href="{% url 'accounts:sign-up'%}">
                                     <i class="fa fa-sign-in"></i> Sign Up
                                 </a>
                             </div>
@@ -60,111 +59,46 @@
 </div>
 
 <script type="text/javascript">
-    let reg_user_url = '{{ reg_user_url }}';
+    let login_user_url = '{{ sign_in_url }}';
     let success_url = '{{ success_url }}';
     let vm = new Vue({
         delimiters: ["[[", "]]"],
         el: '#sign_up_page',
         data () {
             return {
-                first_name: null,
-                second_name: null,
-                email: null,
-                date_of_birth: null,
-                country: null,
-                sex: null,
+                email:null,
                 password: null,
-                password2: null,
-
-                first_name_error:null,
-                second_name_error: null,
-                email_error: null,
-                date_of_birth_error: null,
-                country_error: null,
-                sex_error: null,
-                password_error: null,
-                password2_error: null,
-
-                countries_list: null
+                sign_in_error: null
             }
-        },
-        mounted() {
-            axios.get("{% url 'accounts:get-countries' %}", {
-            }).then(response => (this.countries_list = response.data))
         },
         methods:{
             success_way: function(){
                 window.location.replace(success_url);
             },
             unsuccess_way: function(data){
-                if ('first_name' in data){
-                    this.first_name_error = data['first_name'][0]
+                if (data){
+                    this.sign_in_error = 'Sorry, e-mail or password is wrong ;c'
                 } else {
-                    this.first_name_error = null
-                }
-
-                if ('second_name' in data){
-                    this.second_name_error = data['second_name'][0]
-                } else {
-                    this.second_name_error = null
-                }
-
-                if ('email' in data){
-                    this.email_error = data['email'][0]
-                } else {
-                    this.email_error = null
-                }
-                if ('date_of_birth' in data){
-                    this.date_of_birth_error = data['date_of_birth'][0]
-                } else {
-                    this.date_of_birth_error = null
-                }
-
-                if ('country' in data){
-                    this.country_error = data['country'][0]
-                } else {
-                    this.country_error = null
-                }
-
-                if ('sex' in data){
-                    this.sex_error = data['sex'][0]
-                } else {
-                    this.sex_error = null
-                }
-
-                if ('password' in data){
-                    this.password_error = data['password'][0]
-                } else {
-                    this.password_error = null
-                }
-                if ('password2' in data){
-                    this.password2_error = data['password2'][0]
-                } else {
-                    this.password2_error = null
+                    this.sign_in_error = null
                 }
 
             },
             onSubmit: function(){
                 var data_load = {
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
-                    'first_name': this.first_name,
-                    'second_name': this.second_name,
                     'email': this.email,
-                    'date_of_birth': this.date_of_birth,
-                    'country': this.country,
-                    'sex':this.sex,
-                    'password': this.password,
-                    'password2': this.password2
+                    'password': this.password
                 }
                 var self = this
 
                 $.ajax({
                     type: "POST",
                     async:false,
-                    url: reg_user_url,
+                    url: login_user_url,
                     data: data_load,
                     dataType: 'json',
                     success: function(data){
+                        console.log(data['status'])
                         if (data['status'] === 'OK'){
                             self.success_way()
                         } else{

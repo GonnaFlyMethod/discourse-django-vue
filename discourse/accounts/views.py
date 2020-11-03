@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, views
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
 from django.views import View
@@ -73,7 +73,8 @@ class SignInView(APIView):
 
 		if not request.user.is_authenticated:
 			context = {
-				'sign_in_url': reverse('accounts:sign-in')
+				'sign_in_url': reverse('accounts:sign-in'),
+				'success_url': reverse('discourse:main')
 			}
 			return render(request, self.template, context)
 		else:
@@ -81,7 +82,7 @@ class SignInView(APIView):
 
 	def post(self, request):
 		email_of_user = request.data['email']
-		password = request.data['pasword']
+		password = request.data['password']
 		user = authenticate(email=email_of_user, password=password)
 
 		data = {}
@@ -94,3 +95,8 @@ class SignInView(APIView):
 				data['status'] = 'banned'
 		else:
 			data['status'] = 'wrong_email_or_pass'
+
+
+class LogoutView(views.LogoutView):
+    """Log out for an user."""
+    template_name = 'accounts/logout.html'

@@ -14,7 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    {% block static%}
+    {% block static %}
     {% endblock %}
 
   </head>
@@ -36,18 +36,18 @@
           <a class="nav-link" href="{% url 'discourse:main' %}">Topics</a>
         </li>
         <li id='topics' class="nav-item">
-          <a class="nav-link" href="{% url 'discourse:main' %}">Log out</a>
-        </div>
+          <a class="nav-link" href="{% url 'accounts:logout' %}">Log out</a>
 
       {% else %}
         <li id='topics' class="nav-item">
-          <a class="nav-link" href="{% url 'discourse:main' %}">Sign Up</a>
-        </div>
+          <a class="nav-link" href="{% url 'accounts:sign-up' %}">Sign Up</a>
         <li id='topics' class="nav-item">
-          <a class="nav-link" href="{% url 'discourse:main' %}">Sign In</a>
-        </div>
+          <a class="nav-link" href="{% url 'accounts:sign-in' %}">Sign In</a>
+        
       {% endif %}
+      </div>
     </ul>
+
     <form class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
       <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Search</button>

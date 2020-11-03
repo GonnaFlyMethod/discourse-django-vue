@@ -5,7 +5,7 @@
 
 {% block static %}
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/sign_up.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/sign_up_sign_in.css' %}">
 
 <!-- loading of other resources -->
 <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -81,7 +81,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <a class="btn btn-block g-button" href="#">
+                                <a class="btn btn-block g-button" href="{% url 'accounts:sign-in'%}">
                                     <i class="fa fa-sign-in"></i> Sign in
                                 </a>
                             </div>

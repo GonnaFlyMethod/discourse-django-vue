@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block static %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/logout.css' %}">
+{% endblock %}
+
+
+{% block html %}
+<div id='main_text'>
+	<h1 class="mt-2">Logout</h1>
+	<p>You are logged out!</p>
+	<p>You will be rederected on the main page in 5 seconds...</p>
+</div>
+
+<script type="text/javascript">
+	
+
+	function redirect(){
+		let redirect_url = "{% url 'discourse:main' %}"
+		window.location.replace(redirect_url);
+	}
+
+	setTimeout(redirect, 5000)
+
+</script>
+{% endblock %}
+
