@@ -84,19 +84,22 @@ class SignInView(APIView):
 		email_of_user = request.data['email']
 		password = request.data['password']
 		user = authenticate(email=email_of_user, password=password)
-
 		data = {}
 		if user is not None:
 			if user.is_active:
 				login(request, user)
 				data['status'] = 'OK'
-				return Response(data)
+			# Banned
 			else:
-				data['status'] = 'banned'
+				data['status'] = 'wrong_email_or_pass'
 		else:
 			data['status'] = 'wrong_email_or_pass'
+		return Response(data)
 
 
 class LogoutView(views.LogoutView):
     """Log out for an user."""
     template_name = 'accounts/logout.html'
+
+
+# User profile

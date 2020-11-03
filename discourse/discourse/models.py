@@ -21,4 +21,5 @@ class Comment(models.Model):
 		                         null=True)
 	text = models.TextField(blank=False, null=False)
 	timestamp = models.DateTimeField(auto_now_add=True)
-
+	likes = models.IntegerField(blank=False, null=False, default=0)
+	dislikes = models.IntegerField(blank=False, null=False, default=0)

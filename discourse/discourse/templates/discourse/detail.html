@@ -22,6 +22,7 @@
                     <a target="_blank"><b>[[ comment.author ]]</b></a>
                     <a href="#" class="float-right">[[ comment.timestamp ]]</a>
                     <p id='text_of_comments'>[[ comment.text ]]</p>
+                    <span> Like </span> <span> Dislike</span>
                 </li>
             </ul>
             {% if user.is_authenticated %}
@@ -47,7 +48,7 @@
 
 <script type="text/javascript">
     topic_info_api = '{{ info }}'
-    comments_api = '{{ comments}}'
+    comments_api = '{{ comments }}'
     send_comment_api = '{{ send_comment_link }}'
     vm = new Vue({
         delimiters: ["[[", "]]"],
@@ -59,9 +60,12 @@
         },
         mounted(){
             axios.get(topic_info_api).then(response => (this.topic = response.data))
-            axios.get(comments_api).then(response => (this.comments = response.data))
+            this.get_comments()
         },
         methods:{
+            get_comments: function(){
+                axios.get(comments_api).then(response => (this.comments = response.data))
+            },
             onSubmit: function() {
                 new_comments = $.ajax({
                     type: "POST",
@@ -70,9 +74,16 @@
                     data: {"text": this.text , 'csrfmiddlewaretoken': '{{ csrf_token }}', },
                     dataType: 'json',
                 })
-                axios.get(comments_api).then(response => (this.comments = response.data))
+                this.get_comments()
                 this.text = ''
-            }
+            },
+
+            send_like: function(){
+                var pass = true;
+            },
+            send_dislike: function(){
+                var pass = true;
+            },
         }
 
     })    

@@ -88,8 +88,35 @@ class PostCommentAPI(APIView):
 				serializer.validated_data['author'] = account
 				serializer.validated_data['to_topic'] = topic
 				serializer.save()
+
 				return Response({'status':'OK'})
 			else:
 				return Response(serializer.errors)
+		else:
+			return HttpResponseBadRequest()
+
+
+class LikeCommentAPI(APIView):
+
+	def post(self, request, topicID):
+		data = {}
+		if request.user.is_authenticated:
+			topic = Topic.objects.get(id=topicID)
+			topic.id += 1
+			topic.save()
+			data['status'] = 'OK'
+		else:
+			return HttpResponseBadRequest()
+
+
+class DislikeCommentAPI(APIView):
+
+	def post(self, request, topicID):
+		data = {}
+		if request.user.is_authenticated:
+			topic = Topic.objects.get(id=topicID)
+			topic.id -= 1
+			topic.save()
+			data['status'] = 'OK'
 		else:
 			return HttpResponseBadRequest()
