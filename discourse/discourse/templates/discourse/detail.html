@@ -22,7 +22,7 @@
                     <a target="_blank"><b>[[ comment.author ]]</b></a>
                     <a href="#" class="float-right">[[ comment.timestamp ]]</a>
                     <p id='text_of_comments'>[[ comment.text ]]</p>
-                    <span> Like </span> <span> Dislike</span>
+                    <span v-on:click='send_like([[ comment.id ]], [[ comment.likes ]],[[comment.send_like_api]], [[ comment.unlike_comment_api ]])'> Likes [[ get_likes_of_comments(0) ]]</span>
                 </li>
             </ul>
             {% if user.is_authenticated %}
@@ -50,21 +50,42 @@
     topic_info_api = '{{ info }}'
     comments_api = '{{ comments }}'
     send_comment_api = '{{ send_comment_link }}'
+
     vm = new Vue({
         delimiters: ["[[", "]]"],
         el: '#timeline-discourse',
         data:{
             topic: null,
             comments: null,
-            text: null
+            text: null,
+            liked:null,
+
+            comments_and_likes: {},
         },
         mounted(){
             axios.get(topic_info_api).then(response => (this.topic = response.data))
-            this.get_comments()
+            this.get_comments();
+            cm = this.comments
+            for (c in this.comments){
+                this.comments_and_likes[c] = cm[c]['likes']
+            }
+
         },
         methods:{
-            get_comments: function(){
-                axios.get(comments_api).then(response => (this.comments = response.data))
+            get_comments: function(return_=false){
+                self = this
+                new_comments = $.ajax({
+                    type: "GET",
+                    async:false,
+                    url: comments_api,
+                    dataType: 'json',
+                    success: function(data){
+                        self.comments = data
+                    }
+                })
+            },
+            get_likes_of_comments: function(id){
+                return this.comments_and_likes[id];
             },
             onSubmit: function() {
                 new_comments = $.ajax({
@@ -78,13 +99,37 @@
                 this.text = ''
             },
 
-            send_like: function(){
-                var pass = true;
+            send_like: function(id, num_of_likes, send_like_api, 
+                                url_unlike_comment_api){
+                var self = this;
+                if (!(this.liked)){
+                    $.ajax({
+                        type: "POST",
+                        data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                        async:false,
+                        url: send_like_api,
+                        dataType: 'json',
+                        success: function(data){
+                            self.liked = true;
+                        }
+                    })
+                    this.comments_and_likes[id] = num_of_likes + 1
+                } else {
+                    console.log(url_unlike_comment_api)
+                    $.ajax({
+                        type: "POST",
+                        data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                        async:false,
+                        url: url_unlike_comment_api,
+                        dataType: 'json',
+                        success: function(data){
+                            self.liked = false;
+                        }
+                    })
+                    this.comments_and_likes[id] = num_of_likes - 1
+                }
             },
-            send_dislike: function(){
-                var pass = true;
-            },
-        }
+        },
 
     })    
 </script>

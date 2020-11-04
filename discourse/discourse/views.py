@@ -59,8 +59,9 @@ class TopicDetail(APIView):
 				           kwargs={'topicID': topic.id, 'type_':'topic_info'})
 			comments = reverse('discourse:topic-detail',
 				           kwargs={'topicID': topic.id, 'type_':'comments'})
+
 			send_comment_link = reverse('discourse:post-comment',
-				                   kwargs={'topicID': topic.id}) 
+				                   kwargs={'topicID': topic.id})
 			context = {'topic': topic, 'info':info,'comments': comments,
 			           'send_comment_link': send_comment_link}
 			return render(request, 'discourse/detail.html', context)
@@ -69,11 +70,16 @@ class TopicDetail(APIView):
 		else:
 			comments = topic_info.get_comments(topic)
 			comments_clean = comments
-			for dict_ in comments_clean:
+			for dict_ in comments_clean: 
+				dict_['send_like_api'] = reverse('discourse:like-comment',
+				                   kwargs={'commentID': dict_['id']})
+				url_unlike_comment = reverse('discourse:unlike-comment',
+				                   kwargs={'commentID': dict_['id']})
+				dict_['unlike_comment_api'] = url_unlike_comment
+
 				time_edge = re.search(r'T', dict_['timestamp'])
 				dict_['timestamp'] = dict_['timestamp'][:time_edge.start()]
 			return Response(comments_clean)
-
 
 
 class PostCommentAPI(APIView):
@@ -98,13 +104,29 @@ class PostCommentAPI(APIView):
 
 class LikeCommentAPI(APIView):
 
-	def post(self, request, topicID):
+	def post(self, request, commentID):
+		usr = request.user
 		data = {}
-		if request.user.is_authenticated:
-			topic = Topic.objects.get(id=topicID)
-			topic.id += 1
-			topic.save()
+		if usr.is_authenticated:
+			comment = Comment.objects.get(id=commentID)
+			comment.likes += 1
+			comment.save()
 			data['status'] = 'OK'
+			return Response(data)
+		else:
+			return HttpResponseBadRequest()
+
+class UnlikeCommentAPI(APIView):
+
+	def post(self, request, commentID):
+		usr = request.user
+		data = {}
+		if usr.is_authenticated:
+			comment = Comment.objects.get(id=commentID)
+			comment.likes -= 1
+			comment.save()
+			data['status'] = 'OK'
+			return Response(data)
 		else:
 			return HttpResponseBadRequest()
 

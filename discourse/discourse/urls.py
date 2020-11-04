@@ -16,10 +16,10 @@ rest_api_urls = [
 		    name='get-topics-api'),
 	re_path(r'topics/post-comment/(?P<topicID>\d+)/?',
 		    views.PostCommentAPI.as_view(), name='post-comment'),
-	re_path(r'topics/like-comment/(?P<topicID>\d+)/?',
+	re_path(r'topics/like-comment/(?P<commentID>\d+)/?',
 		    views.LikeCommentAPI.as_view(), name='like-comment'),
-	re_path(r'topics/dislike-comment/(?P<topicID>\d+)/?',
-		    views.DislikeCommentAPI.as_view(), name='dislike-comment'),
+	re_path(r'topics/unlike-comment/(?P<commentID>\d+)/?',
+		    views.UnlikeCommentAPI.as_view(), name='unlike-comment'),
 ]
 
 urlpatterns += rest_api_urls
