@@ -22,3 +22,5 @@ class Comment(models.Model):
 	text = models.TextField(blank=False, null=False)
 	timestamp = models.DateTimeField(auto_now_add=True)
 	likes = models.IntegerField(blank=False, null=False, default=0)
+	who_liked = models.ManyToManyField(Account, related_name='who_liked_c',
+		                               blank=True)

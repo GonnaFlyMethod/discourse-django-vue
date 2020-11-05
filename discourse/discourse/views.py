@@ -79,6 +79,13 @@ class TopicDetail(APIView):
 
 				time_edge = re.search(r'T', dict_['timestamp'])
 				dict_['timestamp'] = dict_['timestamp'][:time_edge.start()]
+
+
+				comment = Comment.objects.get(id=dict_['id'])
+				if request.user in comment.who_liked.all():
+					dict_['who_liked'] = str(request.user)
+				else:
+					dict_['who_liked'] = ''
 			return Response(comments_clean)
 
 
@@ -109,10 +116,15 @@ class LikeCommentAPI(APIView):
 		data = {}
 		if usr.is_authenticated:
 			comment = Comment.objects.get(id=commentID)
-			comment.likes += 1
-			comment.save()
-			data['status'] = 'OK'
-			return Response(data)
+
+			if usr not in comment.who_liked.all():
+				comment.who_liked.add(usr)
+				comment.likes += 1
+				comment.save()
+				data['status'] = 'OK'
+				return Response(data)
+			else:
+				HttpResponseBadRequest()
 		else:
 			return HttpResponseBadRequest()
 
@@ -122,11 +134,17 @@ class UnlikeCommentAPI(APIView):
 		usr = request.user
 		data = {}
 		if usr.is_authenticated:
-			comment = Comment.objects.get(id=commentID)
-			comment.likes -= 1
-			comment.save()
-			data['status'] = 'OK'
-			return Response(data)
+			comment = Comment.objects.get(id=commentID) 
+			if usr in comment.who_liked.all():
+
+				comment.who_liked.remove(usr)
+				comment = Comment.objects.get(id=commentID)
+				comment.likes -= 1
+				comment.save()
+				data['status'] = 'OK'
+				return Response(data)
+			else:
+				return HttpResponseBadRequest()
 		else:
 			return HttpResponseBadRequest()
 
