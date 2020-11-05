@@ -25,7 +25,7 @@
 
                     <span v-if='comments[comment].who_liked'
                           style='color: blue;'
-                          v-on:click='onLike([[ comment ]],[[comments[comment].send_like_api]], [[ comments[comment].unlike_comment_api ]]), comments[comment].who_liked'> Likes [[ comments[comment].likes ]]</span>
+                          v-on:click='onLike([[ comment ]],[[comments[comment].send_like_api]], [[ comments[comment].unlike_comment_api ]]), comments[comment].who_liked'>Likes [[ comments[comment].likes ]]</span>
 
                     <span v-else
                           v-on:click='onLike([[ comment ]],[[comments[comment].send_like_api]], [[ comments[comment].unlike_comment_api ]]), comments[comment].who_liked'> Likes [[ comments[comment].likes ]]</span>

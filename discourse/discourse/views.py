@@ -86,6 +86,9 @@ class TopicDetail(APIView):
 					dict_['who_liked'] = str(request.user)
 				else:
 					dict_['who_liked'] = ''
+
+			lambda_func = lambda x: x['id']
+			comments_clean = sorted(comments_clean, key=lambda_func)
 			return Response(comments_clean)
 
 
