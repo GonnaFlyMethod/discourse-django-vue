@@ -22,7 +22,13 @@
                     <a target="_blank"><b>[[ comments[comment].author ]]</b></a>
                     <a href="#" class="float-right">[[ comments[comment].timestamp ]]</a>
                     <p id='text_of_comments'>[[ comments[comment].text ]]</p>
-                    <span v-on:click='onLike([[ comment ]],[[comments[comment].send_like_api]], [[ comments[comment].unlike_comment_api ]]), comments[comment].who_liked'> Likes [[ comments[comment].likes ]]</span>
+
+                    <span v-if='comments[comment].who_liked'
+                          style='color: blue;'
+                          v-on:click='onLike([[ comment ]],[[comments[comment].send_like_api]], [[ comments[comment].unlike_comment_api ]]), comments[comment].who_liked'> Likes [[ comments[comment].likes ]]</span>
+
+                    <span v-else
+                          v-on:click='onLike([[ comment ]],[[comments[comment].send_like_api]], [[ comments[comment].unlike_comment_api ]]), comments[comment].who_liked'> Likes [[ comments[comment].likes ]]</span>
                 </li>
             </ul>
             {% if user.is_authenticated %}
@@ -67,6 +73,9 @@
 
         },
         methods:{
+            def_val_of_like: function(value){
+                return Boolean(value);
+            },
             onLike: function(id, send_like_api, unlike_comment_api, who_liked){
                 if (current_user === this.comments[id].who_liked){
                      $.ajax({
