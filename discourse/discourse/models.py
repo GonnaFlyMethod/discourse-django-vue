@@ -5,8 +5,9 @@ from accounts.models import Account
 
 class Topic(models.Model):
 	topic = models.CharField(max_length=100)
-	authors = models.ManyToManyField(Account)
-	short_description = models.TextField(max_length=400)
+	author = models.ForeignKey(Account, on_delete=models.CASCADE, blank=True,
+		                       null=True)
+	comment_of_author_of_topic = models.TextField(max_length=2000)
 	timestamp = models.DateTimeField(auto_now_add=True)
 
 	class Meta:

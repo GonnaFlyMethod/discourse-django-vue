@@ -2,6 +2,9 @@
     max-width: 99%;
     word-wrap: break-word;
 }
+#like-possibility{
+    cursor:pointer;
+}
 
 ul.timeline {
     list-style-type: none;

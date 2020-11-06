@@ -32,6 +32,7 @@
                             <div class="info">
                                 <h2 class="title">[[ topic.topic ]]</h2>
                                 <p class="desc">[[ topic.short_description ]]</p>
+                                <p class="desc">[[ topic.author ]]</p>
                             </div>
                             <div class="social">
                                 <ul>
@@ -41,9 +42,6 @@
                         </li>
                     </template>
                 </ul>
-                <div class="spinner-border text-dark" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
                 <p v-else>Loading...</p>
             </div>
         </div>

@@ -163,3 +163,41 @@ class DislikeCommentAPI(APIView):
 			data['status'] = 'OK'
 		else:
 			return HttpResponseBadRequest()
+
+
+class CreateTopicAPI(APIView):
+
+	template = 'discourse/create_topic.html'
+
+	def get(self, request):
+		return render(request, self.template)
+
+	def post(self, request):
+		usr = request.user
+
+		if usr.is_authenticated:
+			create_topic = TopicsSerializer(data=request.data)
+			comments_data = request.data['comment_of_author_of_topic']
+			comment = PostCommentSerializer(data=comments_data)
+			data = {}
+			id_of_topic = None
+			if create_topic.is_valid():
+				create_topic.validated_data['author'] = usr
+				create_topic.save()
+				id_of_topic = create_topic.data['id']
+				data['url_redirect'] = reverse('discourse:topic-detail',
+					                            kwargs={'topicID': id_of_topic,
+					                                    'type_': 'get'})
+				if comment.is_valid():
+					comment.validated_data['author'] = usr
+
+					topic = Topic.objects.get(id=create_topic.data['id'])
+					comment.validated_data['to_topic'] = topic
+					comment.save()
+					data['status'] = 'OK'
+				else:
+					return Response(comment.errors)
+			else:
+				return Response(create_topic.errors)
+		else:
+			return HttpResponseBadRequest()

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+<!-- loading static -->
+
+
+{% block static %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/sign_up_sign_in.css' %}">
+
+<!-- loading of other resources -->
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+{% endblock %}
+{% block html %}
+<div id='create_topic_page'>
+    <div class="container">
+        <div class="col-md-6 mx-auto text-center">
+            <div class="header-title">
+                <h1 class="wv-heading--title">
+                   Discourse - Create new topic
+                </h1>
+                <h2 class="wv-heading--subtitle">
+                   Discuss different topics with the whole world!
+                </h2>
+            </div>
+        </div>
+            <div class="row">
+                <div class="col-md-4 mx-auto">
+                    <div class="myform form ">
+                        <form method="post" id='post_form' @submit.prevent="onSubmit">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <p style="color: red;" v-show='topic_error'>* [[ topic_error ]]</p>
+
+                                <input type="text" name="topic"  class="form-control my-input" id="topic" placeholder="Topic" v-model='topic'>
+                            </div>
+
+                            <div class="form-group">
+                                <p style="color: red;" v-show='comment_of_author_of_topic_error'>* [[ comment_of_author_of_topic_error ]]</p>
+
+                                <input type="text" name="comment_of_author_of_topic"  class="form-control my-input" id="comment_of_author_of_topic" placeholder="Your own opinion about this topic" v-model='comment_of_author_of_topic'>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-block g-button">
+                                    <i class="fa fa-location-arrow" aria-hidden="true"></i> Create new topic
+                                </button>
+                            </div>
+                        </form>
+                         <div class="form-group">
+                                <button class="btn btn-block g-button" data-toggle="modal" data-target="#RulesModal">
+                                    <i class="fa fa-file-text-o" aria-hidden="true"></i> View rules of publication of topics
+                                </button>
+                            </div>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="RulesModal" tabindex="-1" aria-labelledby="RulesModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Rules of publication</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                <ul>
+                                    <li>
+                                        Your topic should be interesting, cuz ,you know, nobody wants to discuss the socks you wear on Sundays ;)
+                                    </li>
+
+                                    <li>
+                                        It should't be provocative or offensive.
+                                    </li>
+                                </ul>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-dark" data-dismiss="modal">Got it</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var create_topic_url = "{% url 'discourse:create-topic' %}"
+    new_vm = new Vue({
+        el: '#create_topic_page',
+        data: {
+            topic: null,
+            comment_of_author_of_topic: null,
+
+            topic_error: null,
+            comment_of_author_of_topic_error: null,
+        },
+        methods: {
+            success_way: function(success_url){
+                window.location.replace(success_url);
+            },
+            unsuccess_way: function(problems){
+                if ('topic' in problems){
+                    this.topic_error = problems['topic'][0]
+                } else if ('comment_of_author_of_topic_error' in problems){
+                    this.comment_of_author_of_topic_error = problems['comment_of_author_of_topic_error'][0]
+                } else {
+                    this.topic_error = ''
+                    this.comment_of_author_of_topic_error = ''
+                }
+            },
+            onSubmit: function(){
+                let self = this;
+                $.ajax({
+                    type: "POST",
+                    async:false,
+                    url: create_topic_url,
+                    data: {"topic": this.topic, 'comment_of_author_of_topic': this.comment_of_author_of_topic, 'csrfmiddlewaretoken': '{{ csrf_token }}', },
+                    dataType: 'json',
+                    success: function(data){
+                        console.log(data)
+                        if ('status' in data){
+                            if (data['status'] === 'OK'){
+                                self.success_way(data['url_redirect'])
+                            }
+                        } else {
+                            self.unsuccess_way(data)
+                        }
+                    }
+                })
+            }
+        }
+
+    })
+
+</script>
+
+{% endblock %}

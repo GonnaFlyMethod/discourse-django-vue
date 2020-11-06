@@ -23,12 +23,14 @@
                     <a href="#" class="float-right">[[ comments[comment].timestamp ]]</a>
                     <p id='text_of_comments'>[[ comments[comment].text ]]</p>
 
-                    <span v-if='comments[comment].who_liked'
-                          style='color: blue;'
-                          v-on:click='onLike([[ comment ]],[[comments[comment].send_like_api]], [[ comments[comment].unlike_comment_api ]]), comments[comment].who_liked'>Likes [[ comments[comment].likes ]]</span>
+                    <div id='like-possibility'>
+                        <span v-if='comments[comment].who_liked'
+                              style='color: blue;'
+                              v-on:click='onLike([[ comment ]],[[comments[comment].send_like_api]], [[ comments[comment].unlike_comment_api ]]), comments[comment].who_liked'>Likes [[ comments[comment].likes ]]</span>
 
-                    <span v-else
-                          v-on:click='onLike([[ comment ]],[[comments[comment].send_like_api]], [[ comments[comment].unlike_comment_api ]]), comments[comment].who_liked'> Likes [[ comments[comment].likes ]]</span>
+                        <span v-else
+                              v-on:click='onLike([[ comment ]],[[comments[comment].send_like_api]], [[ comments[comment].unlike_comment_api ]]), comments[comment].who_liked'> Likes [[ comments[comment].likes ]]</span>
+                    </div>
                 </li>
             </ul>
             {% if user.is_authenticated %}

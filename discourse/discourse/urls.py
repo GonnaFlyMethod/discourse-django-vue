@@ -14,6 +14,8 @@ urlpatterns = [
 rest_api_urls = [
 	re_path(r'api/get-topics/?', views.GetTopicsApi.as_view(),
 		    name='get-topics-api'),
+	re_path(r'create-topic/?', views.CreateTopicAPI.as_view(),
+		     name='create-topic'),
 	re_path(r'topics/post-comment/(?P<topicID>\d+)/?',
 		    views.PostCommentAPI.as_view(), name='post-comment'),
 	re_path(r'topics/like-comment/(?P<commentID>\d+)/?',
