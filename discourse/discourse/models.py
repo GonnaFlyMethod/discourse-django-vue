@@ -7,6 +7,9 @@ class Topic(models.Model):
 	topic = models.CharField(max_length=100)
 	author = models.ForeignKey(Account, on_delete=models.CASCADE, blank=True,
 		                       null=True)
+	views = models.IntegerField(blank=False, null=False, default=0)
+	who_viewed = models.ManyToManyField(Account, related_name='who_viewed_t',
+		                               blank=True)
 	timestamp = models.DateTimeField(auto_now_add=True)
 
 	class Meta:

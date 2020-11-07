@@ -62,8 +62,16 @@ class TopicDetail(APIView):
 
 			send_comment_link = reverse('discourse:post-comment',
 				                   kwargs={'topicID': topic.id})
-			context = {'topic': topic, 'info':info,'comments': comments,
-			           'send_comment_link': send_comment_link}
+			add_view_to_topic_api = reverse('discourse:add-view-to-topic',
+				                   kwargs={'topicID': topic.id});
+
+			context = {
+				'topic': topic,
+				'info':info,
+				'comments': comments,
+			    'send_comment_link': send_comment_link,
+			    'add_view_to_topic_api': add_view_to_topic_api,
+			}
 			return render(request, 'discourse/detail.html', context)
 		elif type_ == 'topic_info':
 			return Response(topic_info.data)
@@ -93,7 +101,6 @@ class TopicDetail(APIView):
 
 
 class PostCommentAPI(APIView):
-
 	def post(self, request, topicID):
 		if request.user.is_authenticated:
 			account = Account.objects.get(id=request.user.id)
@@ -114,7 +121,7 @@ class PostCommentAPI(APIView):
 
 class LikeCommentAPI(APIView):
 
-	def post(self, request, commentID):
+	def patch(self, request, commentID):
 		usr = request.user
 		data = {}
 		if usr.is_authenticated:
@@ -133,7 +140,7 @@ class LikeCommentAPI(APIView):
 
 class UnlikeCommentAPI(APIView):
 
-	def post(self, request, commentID):
+	def patch(self, request, commentID):
 		usr = request.user
 		data = {}
 		if usr.is_authenticated:
@@ -152,17 +159,24 @@ class UnlikeCommentAPI(APIView):
 			return HttpResponseBadRequest()
 
 
-class DislikeCommentAPI(APIView):
+class AddViewToTopicAPI(APIView):
 
-	def post(self, request, topicID):
+	def patch(self, request, topicID):
+		usr = request.user
 		data = {}
-		if request.user.is_authenticated:
+		if usr.is_authenticated:
 			topic = Topic.objects.get(id=topicID)
-			topic.id -= 1
-			topic.save()
-			data['status'] = 'OK'
+
+			if usr not in topic.who_viewed.all():
+				topic.who_viewed.add(usr)
+				topic.views += 1
+				topic.save()
+				data['status'] = 'OK'
+			else:
+				data['status'] = 'VIEWED'
 		else:
-			return HttpResponseBadRequest()
+			data['status'] = 'NOT AUTHENICATED'
+		return Response(data)
 
 
 class CreateTopicAPI(APIView):

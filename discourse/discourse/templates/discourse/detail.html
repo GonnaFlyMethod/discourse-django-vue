@@ -58,6 +58,7 @@
     var topic_info_api = '{{ info }}';
     var comments_api = '{{ comments }}';
     var send_comment_api = '{{ send_comment_link }}';
+    var add_view_to_topic_api = '{{ add_view_to_topic_api }}';
     var current_user = '{{ request.user }}';
 
     vm = new Vue({
@@ -73,6 +74,15 @@
             axios.get(topic_info_api).then(response => (this.topic = response.data))
             this.get_comments();
 
+            $.ajax({
+                headers: {
+                    'X-CSRFTOKEN': '{{ csrf_token }}'
+                },
+                type: "PATCH",
+                url: add_view_to_topic_api,
+                dataType: 'json',
+                    })
+
         },
         methods:{
             def_val_of_like: function(value){
@@ -81,8 +91,10 @@
             onLike: function(id, send_like_api, unlike_comment_api, who_liked){
                 if (current_user === this.comments[id].who_liked){
                      $.ajax({
-                        type: "POST",
-                        data: {'csrfmiddlewaretoken': '{{ csrf_token }}',},
+                        headers: {
+                            'X-CSRFTOKEN': '{{ csrf_token }}'
+                        },
+                        type: "PATCH",
                         url: unlike_comment_api,
                         dataType: 'json',
                     })
@@ -92,8 +104,10 @@
 
                 } else {
                     $.ajax({
-                        type: "POST",
-                        data: {'csrfmiddlewaretoken': '{{ csrf_token }}',},
+                        headers: {
+                            'X-CSRFTOKEN': '{{ csrf_token }}'
+                        },
+                        type: "PATCH",
                         url: send_like_api,
                         dataType: 'json',
                     })

@@ -13,15 +13,17 @@ urlpatterns = [
 
 rest_api_urls = [
 	re_path(r'api/get-topics/?', views.GetTopicsApi.as_view(),
-		    name='get-topics-api'),
+			name='get-topics-api'),
 	re_path(r'create-topic/?', views.CreateTopicAPI.as_view(),
-		     name='create-topic'),
+			name='create-topic'),
+	re_path(r'add-view-to-topic/(?P<topicID>\d+)/?',
+			views.AddViewToTopicAPI.as_view(), name='add-view-to-topic'),
 	re_path(r'topics/post-comment/(?P<topicID>\d+)/?',
-		    views.PostCommentAPI.as_view(), name='post-comment'),
+			views.PostCommentAPI.as_view(), name='post-comment'),
 	re_path(r'topics/like-comment/(?P<commentID>\d+)/?',
-		    views.LikeCommentAPI.as_view(), name='like-comment'),
+			views.LikeCommentAPI.as_view(), name='like-comment'),
 	re_path(r'topics/unlike-comment/(?P<commentID>\d+)/?',
-		    views.UnlikeCommentAPI.as_view(), name='unlike-comment'),
+			views.UnlikeCommentAPI.as_view(), name='unlike-comment'),
 ]
 
 urlpatterns += rest_api_urls
