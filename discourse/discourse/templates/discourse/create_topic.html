@@ -36,9 +36,9 @@
                             </div>
 
                             <div class="form-group">
-                                <p style="color: red;" v-show='comment_of_author_of_topic_error'>* [[ comment_of_author_of_topic_error ]]</p>
+                                <p style="color: red;" v-show='text_error'>* [[ text_error ]]</p>
 
-                                <input type="text" name="comment_of_author_of_topic"  class="form-control my-input" id="comment_of_author_of_topic" placeholder="Your own opinion about this topic" v-model='comment_of_author_of_topic'>
+                                <input type="text" name="comment_of_author_of_topic"  class="form-control my-input" id="comment_of_author_of_topic" placeholder="Your own opinion about this topic" v-model='text'>
                             </div>
                             <div class="form-group">
                                 <button class="btn btn-block g-button">
@@ -88,13 +88,15 @@
 <script type="text/javascript">
     var create_topic_url = "{% url 'discourse:create-topic' %}"
     new_vm = new Vue({
+        delimiters: ["[[", "]]"],
         el: '#create_topic_page',
         data: {
             topic: null,
-            comment_of_author_of_topic: null,
+            /*text of first comment of author of topic*/
+            text: null,
 
             topic_error: null,
-            comment_of_author_of_topic_error: null,
+            text_error: null,
         },
         methods: {
             success_way: function(success_url){
@@ -103,11 +105,14 @@
             unsuccess_way: function(problems){
                 if ('topic' in problems){
                     this.topic_error = problems['topic'][0]
-                } else if ('comment_of_author_of_topic_error' in problems){
-                    this.comment_of_author_of_topic_error = problems['comment_of_author_of_topic_error'][0]
-                } else {
+                } if (!('topic' in problems)){
                     this.topic_error = ''
-                    this.comment_of_author_of_topic_error = ''
+                }
+
+                if ('text' in problems){
+                    this.text_error = problems['text'][0]
+                } if (!('text' in problems)){
+                    this.text_error = ''
                 }
             },
             onSubmit: function(){
@@ -116,10 +121,9 @@
                     type: "POST",
                     async:false,
                     url: create_topic_url,
-                    data: {"topic": this.topic, 'comment_of_author_of_topic': this.comment_of_author_of_topic, 'csrfmiddlewaretoken': '{{ csrf_token }}', },
+                    data: {"topic": this.topic, 'text': this.text, 'csrfmiddlewaretoken': '{{ csrf_token }}', },
                     dataType: 'json',
                     success: function(data){
-                        console.log(data)
                         if ('status' in data){
                             if (data['status'] === 'OK'){
                                 self.success_way(data['url_redirect'])

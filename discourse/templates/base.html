@@ -37,6 +37,9 @@
           <a class="nav-link" href="{% url 'discourse:main' %}">Topics</a>
         </li>
         <li id='topics' class="nav-item">
+          <a class="nav-link" href="{% url 'discourse:create-topic' %}">Create my own topic</a>
+        </li>
+        <li id='topics' class="nav-item">
           <a class="nav-link" href="{% url 'accounts:logout' %}">Log out</a>
 
       {% else %}
