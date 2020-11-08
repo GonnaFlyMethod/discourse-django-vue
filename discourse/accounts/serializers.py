@@ -2,6 +2,9 @@ from datetime import date
 
 from rest_framework import serializers
 
+from discourse.serializers import TopicsSerializer
+from discourse.models import Topic
+
 from .models import Country, Account
 
 
@@ -54,3 +57,14 @@ class SignUpSerializer(serializers.ModelSerializer):
 		account.set_password(password)
 		account.save()
 		return account
+
+
+class UserSerializer(serializers.ModelSerializer):
+	country = serializers.SlugRelatedField(slug_field="name", read_only=True)
+	topics_created = TopicsSerializer(read_only=True, many=True)
+	class Meta:
+		model = Account
+		exclude = ['id', 'password', 'last_login', 'is_superuser', 'is_admin',
+		           'is_active', 'is_staff', 'user_permissions', 'groups']
+
+

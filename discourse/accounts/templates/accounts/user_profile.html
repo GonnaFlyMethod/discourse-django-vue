@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+<!-- loading static -->
+
+
+{% block static %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/user_profile.css' %}">
+
+<!-- loading of other resources -->
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block html %}
+<div class="container" id='user_profile_container'>
+<div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+        <div class="panel panel-white profile-widget">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="image-container bg2" style="background:url(https://thumbs.dreamstime.com/b/word-discourse-printed-white-paper-macro-118059011.jpg)">  
+                        <img src="https://bootdey.com/img/Content/avatar/avatar6.png" class="avatar" alt="avatar"> 
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="details">
+                        <h4>[[user_data.first_name]] [[ user_data.second_name]]<i class="fa fa-sheild"></i></h4>
+                        <div>Country: [[ user_data.country ]]</div>
+                        <div>Sex: [[ user_data.sex ]]</div>
+                        <div>Joined: [[user_data.date_joined]]</div>
+                        <div class="mg-top-10">
+                            <a href="#" class="btn btn-default">About [[ user_data.first_name]]</a>
+                            <a href="#" class="btn btn-success">Add [[ user_data.first_name]]</a>
+                        </div>
+                    </div>
+                </div>
+                 
+            </div>
+        </div>
+        
+        <div class="row" v-for='topic in user_topics_posted'>        
+            <div class="col-sm-12">
+                <div class="panel panel-white post">
+                    <div class="post-heading">
+                        <div class="pull-left image">
+                            <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="img-circle avatar" alt="user profile image">
+                        </div>
+                        <div class="pull-left meta">
+                            <div class="title h5">
+                                <a href="#"><b>[[ topic.author ]]</b></a>
+                                made a topic.
+                            </div>
+                            <h6 class="text-muted time"> [[ topic.timestamp ]]</h6>
+                        </div>
+                    </div> 
+                    <div class="post-description"> 
+                        <p> [[ topic.topic ]]</p>
+                    </div>
+                </div>
+            </div>
+             
+            
+            
+        </div>
+        
+    </div>
+
+</div>
+</div>
+
+<script type="text/javascript">
+    var user_profile_data_api = '{{ user_profile_data_api }}'
+
+    vm = new Vue({
+        delimiters: ["[[", "]]"],
+        el: '#user_profile_container',
+        data: {
+            user_data: null,
+            user_topics_posted: null
+        },
+        mounted(){
+            self = this
+            $.ajax({
+                type: "GET",
+                url: user_profile_data_api,
+                dataType: 'json',
+                success: function(data){
+                    self.user_data = data
+                    self.user_topics_posted = self.user_data['topics_created']
+                }
+            })
+        }
+    })
+</script>
+
+{% endblock %}

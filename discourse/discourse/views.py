@@ -214,6 +214,7 @@ class CreateTopicAPI(APIView):
 					topic = Topic.objects.get(id=create_topic.data['id'])
 					comment.validated_data['to_topic'] = topic
 					comment.save()
+					usr.topics_created.add(topic)
 					data['status'] = 'OK'
 					return Response(data)
 				else:

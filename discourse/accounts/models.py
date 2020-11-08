@@ -19,7 +19,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     date_of_birth = models.DateField("Date of birth")
     sex = models.CharField("Sex", max_length=20)
     country = models.ForeignKey("accounts.Country", on_delete=models.CASCADE)
-
+    topics_created = models.ManyToManyField(to='discourse.Topic',
+                                           related_name='user_topic_created')
     date_joined = models.DateTimeField(verbose_name="Date joined",
                                        default=timezone.now)
     is_admin = models.BooleanField(verbose_name="admin", default=False)

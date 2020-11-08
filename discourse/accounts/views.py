@@ -1,3 +1,5 @@
+import pprint
+
 from django.shortcuts import render
 
 from django.contrib.auth import authenticate, login, views
@@ -9,9 +11,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import CountriesSerializer, SignUpSerializer
+from .serializers import CountriesSerializer, SignUpSerializer, UserSerializer
 
-from .models import Country
+from .models import Country, Account
 
 
 class SignUpFormView(APIView):
@@ -103,3 +105,21 @@ class LogoutView(views.LogoutView):
 
 
 # User profile
+
+class UserProfileView(View):
+	template = 'accounts/user_profile.html'
+	def get(self, request, user_id):
+
+		context = {
+			'user_profile_data_api': reverse('accounts:user-profile-api',
+				                             kwargs={'user_id':user_id}),
+		}
+		return render(request, self.template, context)
+
+
+class UserProfileAPI(APIView):
+
+	def get(self, request, user_id):
+		usr = Account.objects.get(id=user_id)
+		serializer = UserSerializer(usr)
+		return Response(serializer.data)
