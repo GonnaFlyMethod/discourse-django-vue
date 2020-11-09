@@ -11,6 +11,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from discourse.models import Topic
+
 from .serializers import CountriesSerializer, SignUpSerializer, UserSerializer
 
 from .models import Country, Account
@@ -52,7 +54,6 @@ class SignUpFormView(APIView):
 								password=serializer.validated_data['password'])
 			login(request, new_user)
 			data['status'] = 'OK'
-			# return HttpResponseRedirect(reverse('discourse:main'))
 			return Response(data)
 		else:
 			data = serializer.errors
@@ -122,4 +123,13 @@ class UserProfileAPI(APIView):
 	def get(self, request, user_id):
 		usr = Account.objects.get(id=user_id)
 		serializer = UserSerializer(usr)
-		return Response(serializer.data)
+
+		final_resp = serializer.data
+		for topic in final_resp['topics_created']:
+			
+			topic_id = Topic.objects.get(id=topic['id']).id
+			topic['topic_url'] = reverse('discourse:topic-detail',
+				                         kwargs={'topicID':topic_id,
+				                                 'type_': 'get'})
+
+		return Response(final_resp)

@@ -19,7 +19,7 @@
             <h2>[[ topic.topic ]]</h2> 
             <ul class="timeline">
                 <li v-for="comment in comments.keys()">
-                    <a target="_blank"><b>[[ comments[comment].author ]]</b></a>
+                    <a target="_blank" v-bind:href="[[ comments[comment].author_prof_url ]]"><b>[[ comments[comment].author ]]</b></a>
                     <a href="#" class="float-right">[[ comments[comment].timestamp ]]</a>
                     <p id='text_of_comments'>[[ comments[comment].text ]]</p>
 

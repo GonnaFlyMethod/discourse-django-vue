@@ -23,8 +23,8 @@
                     <template v-for="topic in topics">
                         <li id="topic" >
                             <time datetime="2014-07-20">
-                                <span class="day">[[ topic.timestamp ]]</span>
-                                <span class="month">[[ topic.month ]]</span>
+                                <span class="day">[[ topic.day_of_publication ]]</span>
+                                <span class="month">[[ topic.month_of_publication ]]</span>
                                 <span class="year">2014</span>
                                 <span class="time">ALL DAY</span>
                             </time>
@@ -37,7 +37,7 @@
                             </div>
                             <div class="social">
                                 <ul>
-                                    <li class="jump_button" style="width:33%;"><a v-bind:href="topic.url"><h1 id='jump_into_into_topic_icon_h'><i class="fa fa-reply-all" aria-hidden="true"></i></h1></a></li>
+                                    <li class="jump_button" style="width:33%;"><a v-bind:href="[[ topic.self_url ]]"><h1 id='jump_into_into_topic_icon_h'><i class="fa fa-reply-all" aria-hidden="true"></i></h1></a></li>
                                 </ul>
                             </div>
                         </li>
@@ -57,7 +57,7 @@
             topics: null
         },
         mounted(){
-            axios.get("{% url 'discourse:get-topics-api'%}").then(response => (this.topics = response.data))
+            axios.get("{% url 'discourse:get-topics-api'%}").then(response => (this.topics = response.data['results']))
         }
 
     })

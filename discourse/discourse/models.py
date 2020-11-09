@@ -8,6 +8,9 @@ class Topic(models.Model):
 	author = models.ForeignKey(Account, on_delete=models.CASCADE, blank=True,
 		                       null=True, related_name='user_topics')
 	views = models.IntegerField(blank=False, null=False, default=0)
+	self_url = models.URLField(null=True)
+	day_of_publication = models.IntegerField(null=True)
+	month_of_publication = models.CharField(max_length=20, null=True)
 	who_viewed = models.ManyToManyField(Account, related_name='who_viewed_t',
 		                               blank=True)
 	timestamp = models.DateTimeField(auto_now_add=True)

@@ -7,6 +7,8 @@ from django.urls import reverse
 from django.http import HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -24,29 +26,10 @@ class MainPageView(View):
 		return render(request, 'discourse/main.html')
 
 
-class GetTopicsApi(APIView):
-
-	def get(self, request):
-		get_all_topics = Topic.objects.all()
-		serializer = TopicsSerializer(get_all_topics, many=True)
-
-		data_to_display = serializer.data
-		for num_of_iter, dict_ in enumerate(data_to_display):
-			find_day = re.search(r'-\d{1,2}T', dict_['timestamp'])
-			day_start = find_day.start() + 1
-			day_end = find_day.end() - 1
-
-			find_month = re.search(r'-\d{1,2}-', dict_['timestamp'])
-			month_start = find_month.start() + 1
-			month_end = find_month.end() - 1
-			new_timestamp:str = dict_['timestamp'][day_start:day_end]
-			month = dict_['timestamp'][month_start:month_end]
-			dict_['timestamp'] = new_timestamp
-			dict_['month'] = calendar.month_abbr[int(month)]
-			topic_id = int(dict_['id'])
-			dict_['url'] = reverse('discourse:topic-detail',
-				                   kwargs={'topicID':topic_id,'type_': 'get'})
-		return Response(data_to_display)
+class GetTopicsApi(ListAPIView):
+	queryset = Topic.objects.all()
+	pagination_class = PageNumberPagination
+	serializer_class = TopicsSerializer
 
 
 class TopicDetail(APIView):
@@ -84,6 +67,11 @@ class TopicDetail(APIView):
 				url_unlike_comment = reverse('discourse:unlike-comment',
 				                   kwargs={'commentID': dict_['id']})
 				dict_['unlike_comment_api'] = url_unlike_comment
+				e = dict_['author']   # e-mail
+				author_of_comment = Account.objects.get(email=e)
+				author_id = author_of_comment.id
+				dict_['author_prof_url'] = reverse('accounts:user-profile',
+				                   kwargs={'user_id': author_id})
 
 				time_edge = re.search(r'T', dict_['timestamp'])
 				dict_['timestamp'] = dict_['timestamp'][:time_edge.start()]
@@ -209,9 +197,16 @@ class CreateTopicAPI(APIView):
 					                            kwargs={'topicID': id_of_topic,
 					                                    'type_': 'get'})
 
-					comment.validated_data['author'] = usr
-
 					topic = Topic.objects.get(id=create_topic.data['id'])
+					topic.self_url = reverse('discourse:topic-detail',
+	 			                   kwargs={'topicID':topic.id,'type_': 'get'})
+					
+					date = self.get_clean_day_and_month(topic)
+					topic.day_of_publication = date['day']
+					topic.month_of_publication = date['month']
+					topic.save()
+
+					comment.validated_data['author'] = usr
 					comment.validated_data['to_topic'] = topic
 					comment.save()
 					usr.topics_created.add(topic)
@@ -223,3 +218,16 @@ class CreateTopicAPI(APIView):
 				return Response(create_topic.errors)
 		else:
 			return HttpResponseBadRequest()
+
+	def get_clean_day_and_month(self, topic_obj) -> dict:
+
+		# Date & time of publication of topic
+		time_stamp = topic_obj.timestamp
+		day = time_stamp.strftime("%d")
+		month = time_stamp.strftime("%b")
+		if day.startswith('0'):
+			day = day[1:]
+
+		res = {'day': day, 'month': month}
+		return res
+		
