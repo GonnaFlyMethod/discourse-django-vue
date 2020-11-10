@@ -31,7 +31,6 @@ class GetTopicsApi(ListAPIView):
 	pagination_class = PageNumberPagination
 	serializer_class = TopicsSerializer
 
-
 class TopicDetail(APIView):
 
 	def get(self, request, topicID, type_):

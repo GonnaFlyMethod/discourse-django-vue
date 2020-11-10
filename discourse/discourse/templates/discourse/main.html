@@ -46,26 +46,11 @@
                     </ul>
                     <nav aria-label="Page navigation example">
   <ul class="pagination justify-content-center">
-
-    <li class="page-item" v-if="prev_page">
-      <a class="page-link" v-bind:href="[[ prev_page ]]" tabindex="-1">Previous</a>
-    </li>
-
-    <li class="page-item disabled" v-else>
-      <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-    </li>
-
-    <!-- on click get me new page data without refreshing whole page -->
-    <li class="page-item" v-for="page_num in num_of_pages"><a class="page-link" href="#">[[ page_num ]]</a></li>
-
-    <li class="page-item" v-if="next_page">
-      <a class="page-link" v-bind:href="[[ next_page ]]">Next</a>
-    </li>
-
-    <li class="page-item disabled" v-else=>
-      <a class="page-link" aria-disabled="true">Next</a>
-    </li>
-  </ul>
+    <div v-for="(page_num, index) in pages_urls">
+        <li class="page-item" >
+            <span class="page-link" v-on:click="get_inf_from_page(index)">[[ index ]]</span>
+        </li>
+    </div>
 </nav>
                 </div>
                 <div v-else>
@@ -85,9 +70,11 @@
             topics: null,
 
             /*pagination*/
+            current_page: 1,
             num_of_pages: null,
             prev_page: null,
-            next_page: null
+            next_page: null,
+            pages_urls: {}
         },
         mounted(){
             self = this
@@ -99,11 +86,38 @@
                 success: function(data){
                     self.meta = data
                     self.topics = data['results']
-                    self.num_of_pages = Math.ceil(data['count'])
+                    self.num_of_pages = Math.ceil(data['count'] / 2);
+                    self.next = data['next']
+                    
                 }
             })
+
+            if (this.num_of_pages > 1){
+                for (var i = 1; i <= this.num_of_pages; i++){
+                    this.pages_urls[i] = this.next.slice(0,-1) + i
+                } 
+            }
             this.prev_page = this.meta['previous']
             this.next_page = this.meta['next']
+        },
+        methods: {
+            get_inf_from_page: function(page_num){
+                self = this
+
+                if (page_num != this.current_page){
+                    var url = this.next_page.slice(0, -1) + String(page_num)
+                    $.ajax({
+                        type: "GET",
+                        async:false,
+                        url: url,
+                        dataType: 'json',
+                        success: function(data){
+                            self.current_page = parseInt(url.slice(-1))
+                            self.topics = data['results']
+                        }
+                    })
+                }
+            }
         }
 
     })
