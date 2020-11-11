@@ -3,11 +3,19 @@ from django.db import models
 from accounts.models import Account
 
 
+class TagOfTopic(models.Model):
+	name_of_tag = models.CharField(max_length=200)
+
+	def __str__(self):
+		return f'Tag:{self.name_of_tag}'
+
+
 class Topic(models.Model):
 	topic = models.CharField(max_length=100)
 	author = models.ForeignKey(Account, on_delete=models.CASCADE, blank=True,
 		                       null=True, related_name='user_topics')
 	views = models.IntegerField(blank=False, null=False, default=0)
+	tags = models.ManyToManyField(TagOfTopic, blank=True)
 	self_url = models.URLField(null=True)
 	day_of_publication = models.IntegerField(null=True)
 	month_of_publication = models.CharField(max_length=20, null=True)

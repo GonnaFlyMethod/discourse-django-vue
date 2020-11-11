@@ -1,5 +1,4 @@
 import re
-import calendar
 
 from django.views import View
 from django.shortcuts import render
@@ -16,9 +15,9 @@ from rest_framework.decorators import api_view
 from accounts.models import Account
 
 from .serializers import (TopicsSerializer, CommentToTopicSerializer,
-	                      PostCommentSerializer)
+	                      PostCommentSerializer, AttachTagsToTopicSerializer)
 
-from .models import Topic, Comment
+from .models import Topic, Comment, TagOfTopic
 
 
 class MainPageView(View):
@@ -30,6 +29,7 @@ class GetTopicsApi(ListAPIView):
 	queryset = Topic.objects.all()
 	pagination_class = PageNumberPagination
 	serializer_class = TopicsSerializer
+
 
 class TopicDetail(APIView):
 
@@ -182,6 +182,7 @@ class CreateTopicAPI(APIView):
 			comment_data = {
 				'text': comment_from_req
 			}
+
 			create_topic = TopicsSerializer(data=topic_data)
 
 			comment = PostCommentSerializer(data=comment_data)
@@ -209,7 +210,14 @@ class CreateTopicAPI(APIView):
 					comment.validated_data['to_topic'] = topic
 					comment.save()
 					usr.topics_created.add(topic)
-					data['status'] = 'OK'
+					tags_raw:str = request.data['tags_of_topic']
+					tags_are_valid: dict = self.tags_are_valid(tags_raw, topic)
+
+					if tags_are_valid['status']:
+						data['status'] = 'OK'
+					else:
+						data['status'] = 'tags_error'
+						data['tags_error'] = tags_are_valid['errors']
 					return Response(data)
 				else:
 					return Response(comment.errors)
@@ -229,4 +237,32 @@ class CreateTopicAPI(APIView):
 
 		res = {'day': day, 'month': month}
 		return res
-		
+
+	def tags_are_valid(self, tags_raw: str, topic) -> dict:
+		tags_clean:list = tags_raw.split(',')
+		initial_check_of_tags = {}
+		for i in tags_clean:
+			if isinstance(i, str):
+				initial_check_of_tags.setdefault(i, 'OK')
+
+		if len(tags_clean) == len(initial_check_of_tags):
+			existing_tags = TagOfTopic.objects.all()
+			for tag in tags_clean:
+				if tag not in existing_tags:
+					data = {'name_of_tag': tag}
+					serializer = AttachTagsToTopicSerializer(data=data)
+
+					if serializer.is_valid():
+						serializer.save()
+						tag = TagOfTopic.objects.get(id=serializer.data['id'])
+						topic.tags.add(tag)
+					else:
+						return {'status': False,
+						'errors': serializer.errors['name_of_tag']}
+				else:
+					tag = TagOfTopic.objects.get(name_of_tag=tag)
+					topic.tags.add(tag)
+			return {'status': True}
+
+		else:
+			return {'status': False, 'errors': 'Wrong input of tags'}
