@@ -141,7 +141,6 @@
                     data: {"topic": this.topic, 'text': this.text, 'tags_of_topic': this.tags_of_topic,'csrfmiddlewaretoken': '{{ csrf_token }}', },
                     dataType: 'json',
                     success: function(data){
-                        console.log(data)
                         if ('status' in data){
                             if (data['status'] === 'OK'){
                                 self.success_way(data['url_redirect'])

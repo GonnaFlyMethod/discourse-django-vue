@@ -16,7 +16,10 @@
 <div class="container mt-5 mb-5">
     <div class="row">
         <div class="col-md-6 offset-md-3" id="timeline-discourse">
-            <h2>[[ topic.topic ]]</h2> 
+            <h2>[[ topic.topic ]]</h2>
+            <div v-for="tag in tags" style="display: inline;">
+                <span class="badge badge-info" style=" margin-left: 1%;">[[ tag ]] </span>
+            </div>
             <ul class="timeline">
                 <li v-for="comment in comments.keys()">
                     <a target="_blank" v-bind:href="[[ comments[comment].author_prof_url ]]"><b>[[ comments[comment].author ]]</b></a>
@@ -33,6 +36,7 @@
                     </div>
                 </li>
             </ul>
+
             {% if user.is_authenticated %}
             <div id='sep'>
                 <hr>
@@ -68,10 +72,13 @@
             topic: null,
             comments: null,
             text: null,
+            tags: null,
             comments_and_likes: {},
         },
         mounted(){
-            axios.get(topic_info_api).then(response => (this.topic = response.data))
+            axios.get(topic_info_api)
+            .then(response => (this.topic = response.data))
+            .then(response => (this.tags = this.topic['tags']))
             this.get_comments();
 
             $.ajax({

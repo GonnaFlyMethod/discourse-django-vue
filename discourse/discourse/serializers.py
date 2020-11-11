@@ -12,6 +12,8 @@ class CommentToTopicSerializer(serializers.ModelSerializer):
 
 class TopicsSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field="email", read_only=True)
+    tags = serializers.SlugRelatedField(many=True, slug_field="name_of_tag",
+    	                                read_only=True)
     class Meta:
         model = Topic
         fields = '__all__'
