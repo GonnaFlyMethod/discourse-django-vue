@@ -13,9 +13,12 @@
 {% endblock %}
 
 {% block html %}
-<div class="container mt-5 mb-5">
+<div class="container mt-5 mb-5" id="timeline-discourse">
     <div class="row">
-        <div class="col-md-6 offset-md-3" id="timeline-discourse">
+        <div class="col-md-6 offset-md-3" >
+            <h1 style="text-align: center;"> Sphere:
+                <span class="badge badge-pill badge-primary">[[ topic.main_sphere_of_topic ]]</span>
+            </h1>
             <h2>[[ topic.topic ]]</h2>
             <div v-for="tag in tags" style="display: inline;">
                 <span class="badge badge-info" style=" margin-left: 1%;">[[ tag ]] </span>

@@ -177,7 +177,11 @@ class CreateTopicAPI(APIView):
 		usr = request.user
 
 		if usr.is_authenticated:
-			topic_data = {'topic': request.data['topic']}
+			sphere_data = request.data['main_sphere_of_topic']
+			tags_of_topic = request.data['tags']
+			topic_data = {'topic': request.data['topic'],
+			              'main_sphere_of_topic': sphere_data,
+			              'tags': tags_of_topic}
 			comment_from_req = request.data['text']
 			comment_data = {
 				'text': comment_from_req
@@ -189,6 +193,11 @@ class CreateTopicAPI(APIView):
 			data = {}
 			id_of_topic = None
 			if create_topic.is_valid():
+				if not tags_of_topic:
+					data['status'] = 'tags_error'
+					data['tags_error'] = ['This field may not be blank.']
+					return Response(data)
+
 				create_topic.validated_data['author'] = usr
 				if comment.is_valid():
 					create_topic.save()
@@ -204,14 +213,15 @@ class CreateTopicAPI(APIView):
 					date = self.get_clean_day_and_month(topic)
 					topic.day_of_publication = date['day']
 					topic.month_of_publication = date['month']
+	
 					topic.save()
 
 					comment.validated_data['author'] = usr
 					comment.validated_data['to_topic'] = topic
 					comment.save()
 					usr.topics_created.add(topic)
-					tags_raw:str = request.data['tags_of_topic']
-					tags_are_valid: dict = self.tags_are_valid(tags_raw, topic)
+					tags_are_valid: dict = self.tags_are_valid(tags_of_topic,
+						                                       topic)
 
 					if tags_are_valid['status']:
 						data['status'] = 'OK'

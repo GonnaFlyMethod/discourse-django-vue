@@ -15,7 +15,8 @@ class Topic(models.Model):
 	author = models.ForeignKey(Account, on_delete=models.CASCADE, blank=True,
 		                       null=True, related_name='user_topics')
 	views = models.IntegerField(blank=False, null=False, default=0)
-	tags = models.ManyToManyField(TagOfTopic, blank=True)
+	main_sphere_of_topic = models.CharField(max_length=100)
+	tags = models.ManyToManyField(TagOfTopic, blank=False)
 	self_url = models.URLField(null=True)
 	day_of_publication = models.IntegerField(null=True)
 	month_of_publication = models.CharField(max_length=20, null=True)
@@ -44,3 +45,24 @@ class Comment(models.Model):
 
 	def __str__(self):
 		return self.text[:30]
+
+
+class TopicSection(models.Model):
+	# possible Sections:
+
+	# Adventuares
+	# Travel
+	# Home
+	# People
+	# Free time
+	# Art
+	# Sport
+	# Health
+	# Science
+	# Edication
+	# Video games
+	name_of_section = models.CharField(max_length=100)
+	topics_included = models.ManyToManyField(Topic, blank=True)
+
+	def __str__(self):
+		return f'Section: {self.name_of_section}'
