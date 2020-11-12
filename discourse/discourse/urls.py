@@ -6,9 +6,16 @@ from . import views
 app_name = 'discourse'
 
 urlpatterns = [
-	path('main/', views.MainPageView.as_view(), name='main'),
+	path('main/', views.MainView.as_view(), 
+		 name='particular-section'),
+	# Sections
+	path('<str:section>/', views.ParticularSphereView.as_view(), 
+		 name='particular-section'),
+
+	path('',
+	        views.TopicDetail.as_view(), name='topic-detail'),
 	path('topics/<int:topicID>/<str:type_>/',
-	        views.TopicDetail.as_view(), name='topic-detail')
+	        views.TopicDetail.as_view(), name='topic-detail'),
 ]
 
 rest_api_urls = [

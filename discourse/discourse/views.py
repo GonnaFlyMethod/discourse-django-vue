@@ -17,12 +17,17 @@ from accounts.models import Account
 from .serializers import (TopicsSerializer, CommentToTopicSerializer,
 	                      PostCommentSerializer, AttachTagsToTopicSerializer)
 
-from .models import Topic, Comment, TagOfTopic
+from .models import Topic, Comment, TagOfTopic, TopicSection
 
 
-class MainPageView(View):
-	def get(self, request):
-		return render(request, 'discourse/main.html')
+class MainView(APIView):
+	pass
+
+
+class ParticularSphereView(View):
+	def get(self, request, section):
+		context = {'section': section}
+		return render(request, 'discourse/.html', section)
 
 
 class GetTopicsApi(ListAPIView):
@@ -228,6 +233,10 @@ class CreateTopicAPI(APIView):
 					else:
 						data['status'] = 'tags_error'
 						data['tags_error'] = tags_are_valid['errors']
+
+					# Defining the section of topic
+					self.define_section(sphere_data, topic)
+
 					return Response(data)
 				else:
 					return Response(comment.errors)
@@ -247,6 +256,29 @@ class CreateTopicAPI(APIView):
 
 		res = {'day': day, 'month': month}
 		return res
+
+	def define_section(self, sphere_of_topic, topic_obj):
+		sections = ['Travel', 'People', 'Education', 'Video games']
+		all_sections = TopicSection.objects.all()
+		for s in sections:
+			if s not in all_sections:
+				new_section = TopicSection(name_of_section=s)
+				new_section.save()
+
+		if sphere_of_topic == 'Travel':
+			travel_section = TopicSection.objects.get(name_of_section='Travel')
+			travel_section.topics_included.add(topic_obj)
+		elif sphere_of_topic == 'People':
+			people_section = TopicSection.objects.get(name_of_section='People')
+			people_section.topics_included.add(topic_obj)
+		elif sphere_of_topic == 'Education':
+			edu_section = TopicSection.objects.get(name_of_section='Education')
+			edu_section.topics_included.add(topic_obj)
+		else:
+			# Video games section
+			v_games = 'Video games'
+			vgames_section = TopicSection.objects.get(name_of_section=v_games)
+			vgames_section.topics_included.add(topic_obj)
 
 	def tags_are_valid(self, tags_raw: str, topic) -> dict:
 		tags_clean:list = tags_raw.split(',')
