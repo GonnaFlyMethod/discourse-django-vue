@@ -22,8 +22,8 @@ urlpatterns = [
 rest_api_urls = [
 	re_path(r'api/get-sections/?', views.GetSectionsAPI.as_view(),
 		     name='get-sections'),
-	re_path(r'api/get-topics/?', views.GetTopicsApi.as_view(),
-			name='get-topics-api'),
+	re_path(r'api/get-topics/(?P<name_of_section>\w+)/?',
+		    views.GetTopicsApi.as_view(), name='get-topics-api'),
 	re_path(r'create-topic/?', views.CreateTopicAPI.as_view(),
 			name='create-topic'),
 	re_path(r'add-view-to-topic/(?P<topicID>\d+)/?',

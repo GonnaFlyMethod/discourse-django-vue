@@ -52,14 +52,22 @@ class GetSectionsAPI(APIView):
 
 class ParticularSphereView(View):
 	def get(self, request, section):
-		context = {'section': section}
-		return render(request, 'discourse/.html', section)
+		context = {'section': section,
+				   'get_topics_api': reverse('discourse:get-topics-api',
+				   	                       args=(section,))}
+		print(context)
+		return render(request, 'discourse/particular_sphere.html', context)
 
 
 class GetTopicsApi(ListAPIView):
-	queryset = Topic.objects.all()
 	pagination_class = PageNumberPagination
 	serializer_class = TopicsSerializer
+
+	def get_queryset(self):
+		section_name = self.kwargs['name_of_section']
+		section = TopicSection.objects.get(name_of_section=section_name)
+		topics = section.topics_included.all()
+		return topics
 
 
 class TopicDetail(APIView):
@@ -298,6 +306,7 @@ class CreateTopicAPI(APIView):
 
 		}
 		all_sections = TopicSection.objects.all()
+		all_sections = [s.name_of_section for s in all_sections]
 		for s in sections:
 			if s not in all_sections:
 				new_section = TopicSection(name_of_section=s)
