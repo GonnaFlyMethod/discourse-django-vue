@@ -15,13 +15,39 @@ from rest_framework.decorators import api_view
 from accounts.models import Account
 
 from .serializers import (TopicsSerializer, CommentToTopicSerializer,
-	                      PostCommentSerializer, AttachTagsToTopicSerializer)
+	                      PostCommentSerializer, AttachTagsToTopicSerializer,
+	                      SectionsSerializer)
 
 from .models import Topic, Comment, TagOfTopic, TopicSection
 
 
-class MainView(APIView):
-	pass
+class MainView(View):
+	
+	template = 'discourse/main.html'
+	def get(self, request):
+
+		return render(request, self.template)
+
+class GetSectionsAPI(APIView):
+
+	def get(self, request):
+		default_sections = ['Travel', 'People', 'Education', 'Video games']
+		sections = TopicSection.objects.all()
+		serializer = SectionsSerializer(sections, many=True)
+
+		serializer_data = serializer.data
+		for section in serializer_data:
+			section_name = section['name_of_section']
+			if section_name not in default_sections:
+				img_url = section['image_of_section'].url
+				section['image_of_section_url'] = img_url
+			else:
+				section['image_of_section_url'] = section['image_of_section']
+
+			section['url'] = reverse('discourse:particular-section',
+				                     kwargs={'section': section_name})
+
+		return Response(serializer_data)
 
 
 class ParticularSphereView(View):
@@ -259,6 +285,18 @@ class CreateTopicAPI(APIView):
 
 	def define_section(self, sphere_of_topic, topic_obj):
 		sections = ['Travel', 'People', 'Education', 'Video games']
+		sections_default_pics: dict = {
+			'Travel': 'https://static.vecteezy.com/system/resources/previews/' \
+			          '000/224/397/original/compass-travel-vector-illustratio' \
+			          'n.jpg',
+			'People': 'https://img.freepik.com/free-vector/people-waving-hand-' \
+			          'illustration-concept_52683-29825.jpg?size=626&ext=jpg',
+			'Education': 'https://i.pinimg.com/originals/4b/4b/c8/4b4bc8f0e26' \
+			             'e86fcbdfb5b7a898ee910.jpg',
+			'Vid-games': 'https://image.freepik.com/free-vector/colorful-ba' \
+			               'ckground-videogame-flat-design_23-2147567954.jpg?1'
+
+		}
 		all_sections = TopicSection.objects.all()
 		for s in sections:
 			if s not in all_sections:
@@ -271,6 +309,7 @@ class CreateTopicAPI(APIView):
 		elif sphere_of_topic == 'People':
 			people_section = TopicSection.objects.get(name_of_section='People')
 			people_section.topics_included.add(topic_obj)
+
 		elif sphere_of_topic == 'Education':
 			edu_section = TopicSection.objects.get(name_of_section='Education')
 			edu_section.topics_included.add(topic_obj)
@@ -279,6 +318,7 @@ class CreateTopicAPI(APIView):
 			v_games = 'Video games'
 			vgames_section = TopicSection.objects.get(name_of_section=v_games)
 			vgames_section.topics_included.add(topic_obj)
+
 
 	def tags_are_valid(self, tags_raw: str, topic) -> dict:
 		tags_clean:list = tags_raw.split(',')

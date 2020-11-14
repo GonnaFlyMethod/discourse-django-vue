@@ -1,5 +1,8 @@
 import accounts.models
 
+def create_new_country():
+    new_country = accounts.models.Country(name='The United States of America')
+    new_country.save()
 
 def create_acc(user_obj, arguments: dict, manager_obj, user="common_user"):
     """Depending on the value 'user' argument creates a certain type of user."""

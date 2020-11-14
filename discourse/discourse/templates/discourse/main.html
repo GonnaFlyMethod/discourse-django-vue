@@ -19,15 +19,20 @@
 
 {% block html %}
 
-<div class="container-fluid">
+<div class="container-fluid" id="section_list">
         <div class="row">
-            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" v-for='section in sections'>
                 <div class="tile">
                     <div class="wrapper">
-                        <div class="header">Travel</div>
+                        <div class="header">[[ section.name_of_section ]]</div>
 
                         <div class="banner-img">
-                            <img src="https://static.vecteezy.com/system/resources/previews/000/224/397/original/compass-travel-vector-illustration.jpg" alt="Image 1">
+                            <template v-if='section.image_of_section'>
+                                <img src="section.image_of_section_url">
+                            </template>
+                            <template v-else>
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR0i9VWDdN9_Qny-LtyDcPlMlV3BcST5sKqLA&usqp=CAU">
+                            </template>
                         </div>
 
                         <div class="dates">
@@ -89,7 +94,7 @@
                         </div>
 
                         <div class="footer">
-                            <a href="#" class="Cbtn Cbtn-primary">Check it out</a>
+                            <a v-bind:href="[[ section.url]]" class="Cbtn Cbtn-primary">Check it out</a>
                         </div>
                     </div>
                 </div> 
@@ -97,4 +102,19 @@
 
         </div>
     </div>
+
+<script type="text/javascript">
+    var vm = new Vue({
+        delimiters: ["[[", "]]"],
+        el: '#section_list',
+        data: {
+            sections: null,
+        },
+        mounted() {
+            axios.get("{% url 'discourse:get-sections'%}")
+            .then(response => (this.sections = response.data))
+        }
+    })
+
+</script>
 {% endblock %}

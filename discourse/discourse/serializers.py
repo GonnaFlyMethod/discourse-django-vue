@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Topic, Comment, TagOfTopic
+from .models import Topic, Comment, TagOfTopic, TopicSection
 
 
 class CommentToTopicSerializer(serializers.ModelSerializer):
@@ -34,4 +34,11 @@ class AttachTagsToTopicSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = TagOfTopic
+		fields = '__all__'
+
+
+class SectionsSerializer(serializers.ModelSerializer):
+
+	class Meta:
+		model = TopicSection
 		fields = '__all__'

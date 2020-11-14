@@ -63,6 +63,8 @@ class TopicSection(models.Model):
 	# Video games
 	name_of_section = models.CharField(max_length=100)
 	topics_included = models.ManyToManyField(Topic, blank=True)
+	image_of_section = models.ImageField('Section image', null=True, blank=True,
+										 upload_to='discourse/section_images')
 
 	def __str__(self):
 		return f'Section: {self.name_of_section}'

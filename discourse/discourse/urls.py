@@ -7,7 +7,7 @@ app_name = 'discourse'
 
 urlpatterns = [
 	path('main/', views.MainView.as_view(), 
-		 name='particular-section'),
+		 name='main'),
 	# Sections
 	path('<str:section>/', views.ParticularSphereView.as_view(), 
 		 name='particular-section'),
@@ -18,7 +18,10 @@ urlpatterns = [
 	        views.TopicDetail.as_view(), name='topic-detail'),
 ]
 
+
 rest_api_urls = [
+	re_path(r'api/get-sections/?', views.GetSectionsAPI.as_view(),
+		     name='get-sections'),
 	re_path(r'api/get-topics/?', views.GetTopicsApi.as_view(),
 			name='get-topics-api'),
 	re_path(r'create-topic/?', views.CreateTopicAPI.as_view(),
