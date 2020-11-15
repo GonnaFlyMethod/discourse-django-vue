@@ -29,6 +29,7 @@
                     <a href="#" class="float-right">[[ comments[comment].timestamp ]]</a>
                     <p id='text_of_comments'>[[ comments[comment].text ]]</p>
 
+                    {% if request.user.is_authenticated %}
                     <div id='like-possibility'>
                         <span v-if='comments[comment].who_liked'
                               style='color: blue;'
@@ -37,6 +38,9 @@
                         <span v-else
                               v-on:click='onLike([[ comment ]],[[comments[comment].send_like_api]], [[ comments[comment].unlike_comment_api ]]), comments[comment].who_liked'> Likes [[ comments[comment].likes ]]</span>
                     </div>
+                    {% else %}
+                        <span> Likes [[ comments[comment].likes ]]</span>
+                    {% endif %}
                 </li>
             </ul>
 
@@ -67,6 +71,7 @@
     var send_comment_api = '{{ send_comment_link }}';
     var add_view_to_topic_api = '{{ add_view_to_topic_api }}';
     var current_user = '{{ request.user }}';
+    var is_user_authenticated = '{{ request.user.is_authenticated }}'
 
     vm = new Vue({
         delimiters: ["[[", "]]"],
@@ -84,14 +89,16 @@
             .then(response => (this.tags = this.topic['tags']))
             this.get_comments();
 
-            $.ajax({
-                headers: {
-                    'X-CSRFTOKEN': '{{ csrf_token }}'
-                },
-                type: "PATCH",
-                url: add_view_to_topic_api,
-                dataType: 'json',
-                    })
+            if (!(is_user_authenticated === 'False')){
+                $.ajax({
+                    headers: {
+                        'X-CSRFTOKEN': '{{ csrf_token }}'
+                    },
+                    type: "PATCH",
+                    url: add_view_to_topic_api,
+                    dataType: 'json',
+                        })
+            }
 
         },
         methods:{

@@ -11,6 +11,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from accounts.models import Account
 
@@ -28,7 +29,9 @@ class MainView(View):
 
 		return render(request, self.template)
 
+
 class GetSectionsAPI(APIView):
+	permission_classes = [AllowAny]
 
 	def get(self, request):
 		default_sections = ['Travel', 'People', 'Education', 'Video games']
@@ -55,11 +58,11 @@ class ParticularSphereView(View):
 		context = {'section': section,
 				   'get_topics_api': reverse('discourse:get-topics-api',
 				   	                       args=(section,))}
-		print(context)
 		return render(request, 'discourse/particular_sphere.html', context)
 
 
 class GetTopicsApi(ListAPIView):
+	permission_classes = [AllowAny]
 	pagination_class = PageNumberPagination
 	serializer_class = TopicsSerializer
 
@@ -71,6 +74,7 @@ class GetTopicsApi(ListAPIView):
 
 
 class TopicDetail(APIView):
+	permission_classes = [AllowAny]
 
 	def get(self, request, topicID, type_):
 		topic = Topic.objects.get(id=topicID)
@@ -127,6 +131,8 @@ class TopicDetail(APIView):
 
 
 class PostCommentAPI(APIView):
+	permission_classes = [IsAuthenticated]
+
 	def post(self, request, topicID):
 		if request.user.is_authenticated:
 			account = Account.objects.get(id=request.user.id)
@@ -146,6 +152,7 @@ class PostCommentAPI(APIView):
 
 
 class LikeCommentAPI(APIView):
+	permission_classes = [IsAuthenticated]
 
 	def patch(self, request, commentID):
 		usr = request.user
@@ -165,6 +172,7 @@ class LikeCommentAPI(APIView):
 			return HttpResponseBadRequest()
 
 class UnlikeCommentAPI(APIView):
+	permission_classes = [IsAuthenticated]
 
 	def patch(self, request, commentID):
 		usr = request.user
@@ -186,6 +194,7 @@ class UnlikeCommentAPI(APIView):
 
 
 class AddViewToTopicAPI(APIView):
+	permission_classes = [IsAuthenticated]
 
 	def patch(self, request, topicID):
 		usr = request.user
@@ -206,6 +215,7 @@ class AddViewToTopicAPI(APIView):
 
 
 class CreateTopicAPI(APIView):
+	permission_classes = [IsAuthenticated]
 
 	template = 'discourse/create_topic.html'
 

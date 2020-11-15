@@ -6,10 +6,12 @@ from django.contrib.auth import authenticate, login, views
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
 from django.views import View
+
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
 from discourse.models import Topic
 
@@ -19,8 +21,8 @@ from .models import Country, Account
 
 
 class SignUpFormView(APIView):
-
-	temlate = 'accounts/sign_up.html'
+	permission_classes = [AllowAny]
+	template = 'accounts/sign_up.html'
 
 	def get(self, request):
 
@@ -29,7 +31,7 @@ class SignUpFormView(APIView):
 				'reg_user_url': reverse('accounts:sign-up'),
 				'success_url': reverse('discourse:main')
 			}
-			return render(request, self.temlate, context)
+			return render(request, self.template, context)
 		else:
 			return HttpResponseBadRequest()
 
@@ -61,6 +63,7 @@ class SignUpFormView(APIView):
 
 
 class GetCountriesAPI(APIView):
+    permission_classes = [AllowAny]
 
     def get(self, request):
         countries = Country.objects.all()
@@ -69,6 +72,7 @@ class GetCountriesAPI(APIView):
 
 
 class SignInView(APIView):
+	permission_classes = [AllowAny]
 
 	template = 'accounts/sign_in.html'
 
@@ -119,6 +123,7 @@ class UserProfileView(View):
 
 
 class UserProfileAPI(APIView):
+	permission_classes = [IsAuthenticatedOrReadOnly]
 
 	def get(self, request, user_id):
 		usr = Account.objects.get(id=user_id)

@@ -44,14 +44,16 @@
                             </li>
                         </template>
                     </ul>
-                    <nav aria-label="Page navigation example">
-  <ul class="pagination justify-content-center">
-    <div v-for="(page_num, index) in pages_urls">
-        <li class="page-item" >
-            <span class="page-link" v-on:click="get_inf_from_page(index)">[[ index ]]</span>
-        </li>
-    </div>
-</nav>
+                    <div v-show='pages_urls'>
+                        <nav aria-label="Page navigation example">
+                          <ul class="pagination justify-content-center">
+                            <div v-for="(page_num, index) in pages_urls">
+                                <li class="page-item" >
+                                    <span class="page-link" v-on:click="get_inf_from_page(index)">[[ index ]]</span>
+                                </li>
+                            </div>
+                        </nav>
+                    </div>
                 </div>
                 <div v-else>
                     <p>Loading...</p>
