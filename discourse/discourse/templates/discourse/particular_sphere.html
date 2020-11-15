@@ -16,11 +16,11 @@
 {% block html %}
 
 <div id='topics_main_list'>
-    <div class="container" style="padding-top: 5%; align-items: center;">
+    <div class="container" style="padding-top: 5%; align-items: center;" v-if='topics'>
         <div class="row">
             <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]" id='display'>
                 <div v-if="topics">
-                    <ul class="event-list" id="event-list" v-if="topics">
+                    <ul class="event-list" id="event-list">
                         <template v-for="topic in topics">
                             <li id="topic" >
                                 <time datetime="2014-07-20">
@@ -44,22 +44,20 @@
                             </li>
                         </template>
                     </ul>
-                    <div v-show='pages_urls'>
+                    <div v-cloak>
                         <nav aria-label="Page navigation example">
                           <ul class="pagination justify-content-center">
                             <div v-for="(page_num, index) in pages_urls">
-                                <li class="page-item" >
+                                <li class="page-item" v-if='pages_urls'>
                                     <span class="page-link" v-on:click="get_inf_from_page(index)">[[ index ]]</span>
                                 </li>
                             </div>
                         </nav>
                     </div>
                 </div>
-                <div v-else>
-                    <p>Loading...</p>
-                </div>
+                <div v-else id='loader'></div>
             </div>
-        </div>
+        </div>   
     </div>
 </div>
 

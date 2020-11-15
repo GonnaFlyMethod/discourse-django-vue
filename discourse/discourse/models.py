@@ -68,3 +68,6 @@ class TopicSection(models.Model):
 
 	def __str__(self):
 		return f'Section: {self.name_of_section}'
+
+	def get_total_num_of_topics(self) -> int:
+		return len(self.topics_included.all())

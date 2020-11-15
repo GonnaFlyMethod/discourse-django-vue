@@ -15,7 +15,7 @@
 {% block html %}
 <div class="container mt-5 mb-5" id="timeline-discourse">
     <div class="row">
-        <div class="col-md-6 offset-md-3" >
+        <div class="col-md-6 offset-md-3" v-if='comments' v-cloak>
             <h1 style="text-align: center;"> Sphere:
                 <span class="badge badge-pill badge-primary">[[ topic.main_sphere_of_topic ]]</span>
             </h1>
@@ -59,6 +59,7 @@
             </div>
             {% endif %}
         </div>
+        <div v-else id='loader'></div>
     </div>
 </div>
 

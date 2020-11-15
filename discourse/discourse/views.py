@@ -1,7 +1,7 @@
 import re
 
 from django.views import View
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
@@ -40,15 +40,19 @@ class GetSectionsAPI(APIView):
 
 		serializer_data = serializer.data
 		for section in serializer_data:
-			section_name = section['name_of_section']
-			if section_name not in default_sections:
+			s_name = section['name_of_section']
+			if s_name not in default_sections:
 				img_url = section['image_of_section'].url
 				section['image_of_section_url'] = img_url
 			else:
 				section['image_of_section_url'] = section['image_of_section']
 
 			section['url'] = reverse('discourse:particular-section',
-				                     kwargs={'section': section_name})
+				                     kwargs={'section': s_name})
+
+			sections_obj = get_object_or_404(TopicSection, 
+				                             name_of_section=s_name)
+			section['total_topics'] = sections_obj.get_total_num_of_topics()
 
 		return Response(serializer_data)
 
@@ -68,7 +72,8 @@ class GetTopicsApi(ListAPIView):
 
 	def get_queryset(self):
 		section_name = self.kwargs['name_of_section']
-		section = TopicSection.objects.get(name_of_section=section_name)
+		
+		section = get_object_or_404(TopicSection, name_of_section=section_name)
 		topics = section.topics_included.all()
 		return topics
 
@@ -119,7 +124,7 @@ class TopicDetail(APIView):
 				dict_['timestamp'] = dict_['timestamp'][:time_edge.start()]
 
 
-				comment = Comment.objects.get(id=dict_['id'])
+				comment = get_object_or_404(Comment, id=dict_['id'])
 				if request.user in comment.who_liked.all():
 					dict_['who_liked'] = str(request.user)
 				else:
@@ -135,8 +140,8 @@ class PostCommentAPI(APIView):
 
 	def post(self, request, topicID):
 		if request.user.is_authenticated:
-			account = Account.objects.get(id=request.user.id)
-			topic = Topic.objects.get(id=topicID)
+			account = get_object_or_404(Account, id=request.user.id)
+			topic = get_object_or_404(Topic, id=topicID)
 			serializer = PostCommentSerializer(data=request.data)
 
 			if serializer.is_valid():
@@ -158,7 +163,7 @@ class LikeCommentAPI(APIView):
 		usr = request.user
 		data = {}
 		if usr.is_authenticated:
-			comment = Comment.objects.get(id=commentID)
+			comment = get_object_or_404(Comment, id=commentID)
 
 			if usr not in comment.who_liked.all():
 				comment.who_liked.add(usr)
@@ -178,11 +183,10 @@ class UnlikeCommentAPI(APIView):
 		usr = request.user
 		data = {}
 		if usr.is_authenticated:
-			comment = Comment.objects.get(id=commentID) 
+			comment = get_object_or_404(Comment, id=commentID) 
 			if usr in comment.who_liked.all():
 
 				comment.who_liked.remove(usr)
-				comment = Comment.objects.get(id=commentID)
 				comment.likes -= 1
 				comment.save()
 				data['status'] = 'OK'
@@ -200,7 +204,7 @@ class AddViewToTopicAPI(APIView):
 		usr = request.user
 		data = {}
 		if usr.is_authenticated:
-			topic = Topic.objects.get(id=topicID)
+			topic = get_object_or_404(Topic, id=topicID)
 
 			if usr not in topic.who_viewed.all():
 				topic.who_viewed.add(usr)

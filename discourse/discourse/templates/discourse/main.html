@@ -21,34 +21,24 @@
 
 <div class="container-fluid" id="section_list">
         <div class="row" v-if='sections'>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" v-for='section in sections'>
+            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" v-for='section in sections' v-cloak>
                 <div class="tile">
                     <div class="wrapper">
                         <div class="header">[[ section.name_of_section ]]</div>
 
                         <div class="banner-img">
                             <template v-if='section.image_of_section'>
-                                <img src="section.image_of_section_url">
+                                <img v-bind:src="[[section.image_of_section_url]]">
                             </template>
                             <template v-else>
                                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR0i9VWDdN9_Qny-LtyDcPlMlV3BcST5sKqLA&usqp=CAU">
                             </template>
                         </div>
 
-                        <div class="dates">
-                            <div class="start">
-                                <strong>STARTS</strong> 12:30 JAN 2015
-                                <span></span>
-                            </div>
-                            <div class="ends">
-                                <strong>ENDS</strong> 14:30 JAN 2015
-                            </div>
-                        </div>
-
                         <div class="stats">
 
                             <div>
-                                <strong>INVITED</strong> 3098
+                                <strong>Total topics</strong> [[ section.total_topics]]
                             </div>
 
                             <div>
@@ -102,7 +92,7 @@
 
         </div>
         
-        <div v-else id='loader' class="loader"></div>
+        <div v-else id='loader'></div>
     </div>
 
 <script type="text/javascript">
