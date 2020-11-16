@@ -17,11 +17,12 @@ class Topic(models.Model):
 	views = models.IntegerField(blank=False, null=False, default=0)
 	main_sphere_of_topic = models.CharField(max_length=100)
 	tags = models.ManyToManyField(TagOfTopic, blank=False)
-	self_url = models.URLField(null=True)
+	self_url = models.CharField(max_length=1000, null=True)
 	day_of_publication = models.IntegerField(null=True)
 	month_of_publication = models.CharField(max_length=20, null=True)
 	who_viewed = models.ManyToManyField(Account, related_name='who_viewed_t',
 		                               blank=True)
+	approved = models.BooleanField(default=False)
 	timestamp = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
@@ -70,4 +71,4 @@ class TopicSection(models.Model):
 		return f'Section: {self.name_of_section}'
 
 	def get_total_num_of_topics(self) -> int:
-		return len(self.topics_included.all())
+		return len(self.topics_included.all().filter(approved=True))

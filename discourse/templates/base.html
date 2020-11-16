@@ -39,6 +39,11 @@
         <li id='topics' class="nav-item">
           <a class="nav-link" href="{% url 'discourse:create-topic' %}">Create my own topic</a>
         </li>
+        {% if request.user.is_staff%}
+        <li id='topics' class="nav-item">
+          <a class="nav-link" href="{% url 'discourse:not-approved-page' %}">See not approved posts</a>
+        </li>
+        {% endif %}
         <li id='topics' class="nav-item">
           <a class="nav-link" href="{% url 'accounts:logout' %}">Log out</a>
 

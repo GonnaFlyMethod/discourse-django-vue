@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+<!-- loading static -->
+
+
+{% block static %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'discourse/css/particular_sphere.css' %}">
+
+<!-- loading of other resources -->
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+
+{% endblock %}
+
+{% block html %}
+
+<div id='topics_main_list'>
+    <div class="container" style="padding-top: 5%; align-items: center;" v-if='topics'>
+        <div class="row">
+            <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]" id='display'>
+                <div v-if="topics">
+                    <ul class="event-list" id="event-list">
+                        <template v-for="topic in topics">
+                            <li id="topic" >
+                                <time datetime="2014-07-20">
+                                    <span class="day">[[ topic.day_of_publication ]]</span>
+                                    <span class="month">[[ topic.month_of_publication ]]</span>
+                                    <span class="year">2014</span>
+                                    <span class="time">ALL DAY</span>
+                                </time>
+                                <img alt="Independence Day" src="https://farm4.staticflickr.com/3100/2693171833_3545fb852c_q.jpg" />
+                                <div class="info">
+                                    <h2 class="title">[[ topic.topic ]]</h2>
+                                    <p class="desc">[[ topic.short_description ]]</p>
+                                    <p class="desc">Author: [[ topic.author ]]</p>
+                                    <p class="desc">Views: [[ topic.views ]]</p>
+                                    <ul>
+                                <li style="width:33%;"><span class="fa fa-check"></span></li>
+                                <li style="width:34%;"><span class="fa fa-trash-o"></span></li>
+                            </ul>
+                                </div>
+                                <div class="social">
+                                    <ul>
+                                        <li class="jump_button" style="width:33%;"><a v-bind:href="[[ topic.self_url ]]"><h1 id='jump_into_into_topic_icon_h'><i class="fa fa-reply-all" aria-hidden="true"></i></h1></a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                    <div v-cloak>
+                        <nav aria-label="Page navigation example">
+                          <ul class="pagination justify-content-center">
+                            <div v-for="(page_num, index) in pages_urls">
+                                <li class="page-item" v-if='pages_urls'>
+                                    <span class="page-link" v-on:click="get_inf_from_page(index)">[[ index ]]</span>
+                                </li>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+                <div v-else id='loader'></div>
+            </div>
+        </div>   
+    </div>
+</div>
+
+<script type="text/javascript">
+    vm = new Vue({
+
+        delimiters: ["[[", "]]"],
+        el: '#display',
+        data:{
+            meta: null,
+            topics: null,
+            /*pagination*/
+            current_page: 1,
+            num_of_pages: null,
+            prev_page: null,
+            next_page: null,
+            pages_urls: {}
+        },
+        mounted(){
+            self = this
+            $.ajax({
+                type: "GET",
+                async:false,
+                url: "{{ not_approved_topics_api }}",
+                dataType: 'json',
+                success: function(data){
+                    self.meta = data
+                    self.topics = data['results']
+                    self.num_of_pages = Math.ceil(data['count'] / 2);
+                    self.next = data['next']
+                    
+                }
+            })
+
+            if (this.num_of_pages > 1){
+                for (var i = 1; i <= this.num_of_pages; i++){
+                    this.pages_urls[i] = this.next.slice(0,-1) + i
+                } 
+            }
+            this.prev_page = this.meta['previous']
+            this.next_page = this.meta['next']
+        },
+        methods: {
+            get_inf_from_page: function(page_num){
+                self = this
+
+                if (page_num != this.current_page){
+                    var url = this.next_page.slice(0, -1) + String(page_num)
+                    $.ajax({
+                        type: "GET",
+                        async:false,
+                        url: url,
+                        dataType: 'json',
+                        success: function(data){
+                            self.current_page = parseInt(url.slice(-1))
+                            self.topics = data['results']
+                        }
+                    })
+                }
+            }
+        }
+
+    })
+
+    setInterval(function(){
+        axios.get("{{ get_topics_api }}").then(response => (vm.topics = response.data))
+    }, 100000);
+
+
+</script>
+{% endblock %}

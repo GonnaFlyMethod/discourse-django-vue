@@ -1,7 +1,7 @@
 import re
 
 from django.views import View
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.urls import reverse
 from django.http import HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
@@ -11,7 +11,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 
 from accounts.models import Account
 
@@ -74,7 +74,7 @@ class GetTopicsApi(ListAPIView):
 		section_name = self.kwargs['name_of_section']
 		
 		section = get_object_or_404(TopicSection, name_of_section=section_name)
-		topics = section.topics_included.all()
+		topics = section.topics_included.all().filter(approved=True)
 		return topics
 
 
@@ -82,7 +82,12 @@ class TopicDetail(APIView):
 	permission_classes = [AllowAny]
 
 	def get(self, request, topicID, type_):
+
 		topic = Topic.objects.get(id=topicID)
+
+		if not topic.approved and not request.user.is_staff:
+			return HttpResponseBadRequest()
+
 		topic_info = TopicsSerializer(topic)
 		if type_ == 'get':
 			info = reverse('discourse:topic-detail',
@@ -142,6 +147,10 @@ class PostCommentAPI(APIView):
 		if request.user.is_authenticated:
 			account = get_object_or_404(Account, id=request.user.id)
 			topic = get_object_or_404(Topic, id=topicID)
+
+			if not topic.approved:
+				return response({'status': 'NOT PUBLISHED'})
+
 			serializer = PostCommentSerializer(data=request.data)
 
 			if serializer.is_valid():
@@ -165,14 +174,17 @@ class LikeCommentAPI(APIView):
 		if usr.is_authenticated:
 			comment = get_object_or_404(Comment, id=commentID)
 
-			if usr not in comment.who_liked.all():
-				comment.who_liked.add(usr)
-				comment.likes += 1
-				comment.save()
-				data['status'] = 'OK'
-				return Response(data)
+			if comment.to_topic.approved:
+				if usr not in comment.who_liked.all():
+					comment.who_liked.add(usr)
+					comment.likes += 1
+					comment.save()
+					data['status'] = 'OK'
+					return Response(data)
+				else:
+					return HttpResponseBadRequest()
 			else:
-				HttpResponseBadRequest()
+				return HttpResponseBadRequest()
 		else:
 			return HttpResponseBadRequest()
 
@@ -183,14 +195,17 @@ class UnlikeCommentAPI(APIView):
 		usr = request.user
 		data = {}
 		if usr.is_authenticated:
-			comment = get_object_or_404(Comment, id=commentID) 
-			if usr in comment.who_liked.all():
+			comment = get_object_or_404(Comment, id=commentID)
+			if comment.to_topic.approved:
+				if usr in comment.who_liked.all():
 
-				comment.who_liked.remove(usr)
-				comment.likes -= 1
-				comment.save()
-				data['status'] = 'OK'
-				return Response(data)
+					comment.who_liked.remove(usr)
+					comment.likes -= 1
+					comment.save()
+					data['status'] = 'OK'
+					return Response(data)
+				else:
+					return HttpResponseBadRequest()
 			else:
 				return HttpResponseBadRequest()
 		else:
@@ -206,13 +221,17 @@ class AddViewToTopicAPI(APIView):
 		if usr.is_authenticated:
 			topic = get_object_or_404(Topic, id=topicID)
 
-			if usr not in topic.who_viewed.all():
-				topic.who_viewed.add(usr)
-				topic.views += 1
-				topic.save()
-				data['status'] = 'OK'
+			if topic.approved:
+				if usr not in topic.who_viewed.all():
+					topic.who_viewed.add(usr)
+					topic.views += 1
+					topic.save()
+					data['status'] = 'OK'
+				else:
+					data['status'] = 'VIEWED'
 			else:
-				data['status'] = 'VIEWED'
+				data['status'] = 'NOT PUBLISHED'
+				return Response(data)
 		else:
 			data['status'] = 'NOT AUTHENICATED'
 		return Response(data)
@@ -371,3 +390,50 @@ class CreateTopicAPI(APIView):
 
 		else:
 			return {'status': False, 'errors': 'Wrong input of tags'}
+
+
+class NotApprovedTopicsApi(View):
+
+	template = 'discourse/not_approved.html'
+	def get(self, request):
+		get_not_approved_url = reverse('discourse:get-not-approved-topics-api')
+		context = {
+			'not_approved_topics_api': get_not_approved_url
+		}
+		return render(request, self.template, context)
+
+
+class GetNotApprovedTopicsApi(ListAPIView):
+	permission_classes = [IsAdminUser]
+	pagination_class = PageNumberPagination
+	serializer_class = TopicsSerializer
+
+	def get_queryset(self):
+		not_approved_topics = get_list_or_404(Topic, approved=False)
+		return not_approved_topics
+
+
+class ApproveTopicAPI(APIView):
+
+	permission_classes = [IsAdminUser]
+
+	def patch(self, request, topicID):
+
+		data: dict = {}
+		topic = get_object_or_404(Topic, id=topicID)
+		topic.approved = True
+		topic.save()
+
+		data['status'] = 'ok'
+		return Response(data)
+
+
+class DisApproveTopicAPI(APIView):
+
+	permission_classes = [IsAdminUser]
+
+	def delete(self, request, topicID):
+		data: dict = {}
+		topic = get_object_or_404(Topic, id=topicID)
+		topic.delete()
+		return Response(data)
