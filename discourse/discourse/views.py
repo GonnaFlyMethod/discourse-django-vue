@@ -398,7 +398,7 @@ class NotApprovedTopicsApi(View):
 	def get(self, request):
 		get_not_approved_url = reverse('discourse:get-not-approved-topics-api')
 		context = {
-			'not_approved_topics_api': get_not_approved_url
+			'not_approved_topics_api': get_not_approved_url,
 		}
 		return render(request, self.template, context)
 
@@ -417,10 +417,12 @@ class ApproveTopicAPI(APIView):
 
 	permission_classes = [IsAdminUser]
 
-	def patch(self, request, topicID):
+	def patch(self, request):
 
+		# Getting data from the dict
+		topic_id: int = request.POST.get('id_of_topic', None)
 		data: dict = {}
-		topic = get_object_or_404(Topic, id=topicID)
+		topic = get_object_or_404(Topic, id=topic_id)
 		topic.approved = True
 		topic.save()
 
@@ -432,8 +434,10 @@ class DisApproveTopicAPI(APIView):
 
 	permission_classes = [IsAdminUser]
 
-	def delete(self, request, topicID):
+	def delete(self, request):
+
+		topic_id: int = request.POST.get('id_of_topic', None)
 		data: dict = {}
-		topic = get_object_or_404(Topic, id=topicID)
+		topic = get_object_or_404(Topic, id=topic_id)
 		topic.delete()
 		return Response(data)

@@ -32,10 +32,10 @@ rest_api_urls = [
 		    name='get-not-approved-topics-api'),
 
 	# Topic approvement / disapprovement
-	re_path(r'api/approve-topic/(?P<topicID>)/?',
+	re_path(r'api/approve-topic/?',
 		    views.ApproveTopicAPI.as_view(),
 		    name='approve-topic-api'),
-	re_path(r'api/dispprove-topic/(?P<topicID>)/?',
+	re_path(r'api/dispprove-topic/',
 		    views.DisApproveTopicAPI.as_view(), name='dispprove-topic-api'),
 
 	re_path(r'add-view-to-topic/(?P<topicID>\d+)/?',
