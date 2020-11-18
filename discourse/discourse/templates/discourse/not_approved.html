@@ -75,6 +75,8 @@
             topics: null,
 
             /*pagination*/
+            first_page: null,
+            count: null,
             current_page: 1,
             num_of_pages: null,
             prev_page: null,
@@ -82,35 +84,57 @@
             pages_urls: {}
         },
         mounted(){
-            self = this
-            $.ajax({
-                type: "GET",
-                async:false,
-                url: "{{ not_approved_topics_api }}",
-                dataType: 'json',
-                success: function(data){
-                    self.meta = data
-                    self.topics = data['results']
-                    self.num_of_pages = Math.ceil(data['count'] / 2);
-                    self.next = data['next']
-                    
-                }
-            })
-
-            if (this.num_of_pages > 1){
-                for (var i = 1; i <= this.num_of_pages; i++){
-                    this.pages_urls[i] = this.next.slice(0,-1) + i
-                } 
-            }
-            this.prev_page = this.meta['previous']
-            this.next_page = this.meta['next']
+            this.get_not_approved_topics()
+            this.get_num_of_pages()
         },
+
         methods: {
-            get_inf_from_page: function(page_num){
+            get_num_of_pages: function(){
+                this.num_of_pages = Math.ceil(this.count / 2);
+                this.pages_urls = {}
+                if (this.num_of_pages > 1){
+                    for (var i = 1; i <= this.num_of_pages; i++){
+                        this.pages_urls[i] = this.next.slice(0,-1) + i
+                    } 
+                } else if (this.num_of_pages === 1){
+                    this.get_not_approved_topics()
+                }
+                this.prev_page = this.meta['previous']
+                this.next_page = this.meta['next']
+            },
+            get_not_approved_topics: function(){
                 self = this
+                $.ajax({
+                    type: "GET",
+                    async:false,
+                    url: "{{ not_approved_topics_api }}",
+                    dataType: 'json',
+                    success: function(data){
+                        self.meta = data
+                        self.topics = data['results']
+                        self.count = data['count']
+
+                        try{
+                            self.next = data['next']
+                            self.first_page = data['next'].slice(0, -1) + String(1)
+                        } catch (error){
+                        }
+                    }
+                })
+            },
+            get_inf_from_page: function(page_num){
+                if (typeof page_num === "undefined" && this.current_page == 2){
+                    return 0
+                }
+                self = this;
+                var page_num_dublicate = page_num;
+                if (this.topics.length == 0){
+                    this.current_page -= 1
+                    page_num_dublicate = this.current_page
+                }
 
                 if (page_num != this.current_page){
-                    var url = this.next_page.slice(0, -1) + String(page_num)
+                    var url = this.next_page.slice(0, -1) + String(page_num_dublicate)
                     $.ajax({
                         type: "GET",
                         async:false,
@@ -138,6 +162,9 @@
                         self.topics.splice(index, 1);
                         }
                 })
+                this.count -= 1
+                this.get_num_of_pages()
+                this.get_inf_from_page()
             },
 
             disapproved: function(id_of_topic, index){
@@ -156,6 +183,9 @@
                         self.topics.splice(index, 1);
                     }
                 })
+                this.count -= 1
+                this.get_num_of_pages()
+                this.get_inf_from_page()
             }
         }
 
