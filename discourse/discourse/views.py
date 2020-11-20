@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.http import HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
+from rest_framework.parsers import FileUploadParser
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
@@ -240,13 +241,12 @@ class AddViewToTopicAPI(APIView):
 
 class CreateTopicAPI(APIView):
 	permission_classes = [IsAuthenticated]
-
 	template = 'discourse/create_topic.html'
 
 	def get(self, request):
 		return render(request, self.template)
 
-	def post(self, request):
+	def post(self, request, format=None):
 		usr = request.user
 
 		if usr.is_authenticated:
@@ -254,7 +254,8 @@ class CreateTopicAPI(APIView):
 			tags_of_topic = request.data['tags']
 			topic_data = {'topic': request.data['topic'],
 			              'main_sphere_of_topic': sphere_data,
-			              'tags': tags_of_topic}
+			              'tags': tags_of_topic,
+			              'image_of_topic': request.data['file']}
 			comment_from_req = request.data['text']
 			comment_data = {
 				'text': comment_from_req

@@ -27,12 +27,22 @@
             <div class="row">
                 <div class="col-md-4 mx-auto">
                     <div class="myform form ">
-                        <form method="post" id='post_form' @submit.prevent="onSubmit">
+                        <form method="post" id='post_form' @submit.prevent="onSubmit(this)"enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="form-group">
                                 <p style="color: red;" v-show='topic_error'>* [[ topic_error ]]</p>
 
                                 <input type="text" name="topic"  class="form-control my-input" id="topic" placeholder="Topic" v-model='topic'>
+                            </div>
+
+                            <div class="form-group">
+                                <p style="color: red;" v-show='image_error'>* [[ image_error ]]</p>
+
+                                <input type="file" name="image_of_topic" class="form-control btn btn-dark" id="image_of_topic" placeholder="image_of_topic" v-on:change="file_uploaded" ref='image_of_topic'>
+
+                                <div v-show="user_image_src" style="padding-top: 5%;">
+                                    <img v-bind:src="user_image_src" alt="Image of your topic" class="img-thumbnail">
+                                </div>
                             </div>
 
                             <div class="form-group">
@@ -105,11 +115,13 @@
 
 <script type="text/javascript">
     var create_topic_url = "{% url 'discourse:create-topic' %}"
-    new_vm = new Vue({
+    vm = new Vue({
         delimiters: ["[[", "]]"],
         el: '#create_topic_page',
         data: {
             topic: null,
+            user_image_src: null,
+            file: null,
             /*text of first comment of author of topic*/
             text: null,
 
@@ -118,6 +130,7 @@
             tags_of_topic: null,
 
             topic_error: null,
+            image_error: null,
             text_error: null,
 
             main_sphere_error: null,
@@ -125,6 +138,12 @@
 
         },
         methods: {
+            file_uploaded: function(){
+                var file = this.$refs.image_of_topic.files[0];
+                this.file = file
+                var file_url = URL.createObjectURL(file);
+                this.user_image_src = file_url
+            },
             success_way: function(success_url){
                 window.location.replace(success_url);
             },
@@ -154,12 +173,46 @@
                 }
             },
             onSubmit: function(){
-                let self = this;
-                $.ajax({
+                var self = this;
+                let formData = new FormData();
+
+                formData.append('file', this.file);
+                formData.append('topic', this.topic)
+                formData.append('text', this.text)
+                formData.append('tags', this.tags_of_topic)
+                formData.append('main_sphere_of_topic', this.main_sphere)
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+
+                axios.post(create_topic_url,
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                ).then(function(response){
+                    var data = response.data;
+                    if ('status' in data){
+                            if (data['status'] === 'OK'){
+                                self.success_way(data['url_redirect'])
+                            } else{
+                                self.unsuccess_way(data)
+                            }
+                    } else {
+                        self.unsuccess_way(data)
+                    }
+                })
+                .catch(function(error){
+                    console.log(error);
+                });
+                /*$.ajax({
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
                     type: "POST",
                     async:false,
                     url: create_topic_url,
-                    data: {"topic": this.topic, 'text': this.text, 'tags': this.tags_of_topic, 'main_sphere_of_topic': this.main_sphere,'csrfmiddlewaretoken': '{{ csrf_token }}', },
+                    data: formData,
                     dataType: 'json',
                     success: function(data){
                         if ('status' in data){
@@ -172,11 +225,13 @@
                             self.unsuccess_way(data)
                         }
                     }
-                })
+                })*/
             }
         }
 
     })
+
+
 
 </script>
 
