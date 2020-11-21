@@ -171,6 +171,12 @@
                 } if (!('main_sphere_of_topic' in problems)){
                     this.main_sphere_error = ''
                 }
+
+                if ('image_of_topic' in problems){
+                    this.image_error = 'Please, upload the main image of your topic'
+                } if (!('image_of_topic' in problems)){
+                    this.image_error = ''
+                }
             },
             onSubmit: function(){
                 var self = this;
@@ -203,7 +209,7 @@
                     }
                 })
                 .catch(function(error){
-                    console.log(error);
+
                 });
                 /*$.ajax({
                     headers: {

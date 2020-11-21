@@ -287,6 +287,11 @@ class CreateTopicAPI(APIView):
 					date = self.get_clean_day_and_month(topic)
 					topic.day_of_publication = date['day']
 					topic.month_of_publication = date['month']
+
+					image_url_raw = topic.image_of_topic
+
+					if image_url_raw:
+						topic.image_url = image_url_raw.url
 	
 					topic.save()
 

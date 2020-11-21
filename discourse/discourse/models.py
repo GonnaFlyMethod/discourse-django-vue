@@ -25,6 +25,7 @@ class Topic(models.Model):
 	approved = models.BooleanField(default=False)
 	image_of_topic = models.ImageField('Topic image', null=True, blank=True,
 										upload_to='discourse/topic_images')
+	image_url = models.CharField(max_length=1000, blank=True, null=True)
 	timestamp = models.DateTimeField(auto_now_add=True)
 
 	class Meta:

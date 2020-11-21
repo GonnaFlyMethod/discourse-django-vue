@@ -30,7 +30,7 @@
                                     <span class="time">ALL DAY</span>
                                 </time>
 
-                                <img v-if='topic.image_of_topic' alt="Independence Day" src="topic.image_of_topic"/>
+                                <img v-if='topic.image_url' alt="Independence Day" v-bind:src="topic.image_url"/>
                                 <img v-else alt="Independence Day" src="https://image.freepik.com/free-vector/conversation-concept-illustration_114360-1102.jpg"/>
 
                                 <div class="info">
