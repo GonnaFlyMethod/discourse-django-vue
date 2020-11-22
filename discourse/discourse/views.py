@@ -19,7 +19,7 @@ from accounts.models import Account
 from .serializers import (TopicsSerializer, CommentToTopicSerializer,
 	                      PostCommentSerializer, AttachTagsToTopicSerializer,
 	                      SectionsSerializer)
-
+from .forms import RichEditorForm
 from .models import Topic, Comment, TagOfTopic, TopicSection
 
 
@@ -108,6 +108,7 @@ class TopicDetail(APIView):
 				'comments': comments,
 			    'send_comment_link': send_comment_link,
 			    'add_view_to_topic_api': add_view_to_topic_api,
+			    'form': RichEditorForm()
 			}
 			return render(request, 'discourse/detail.html', context)
 		elif type_ == 'topic_info':

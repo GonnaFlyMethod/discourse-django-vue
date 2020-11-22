@@ -10,11 +10,12 @@
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 {% endblock %}
 
 {% block html %}
-<div class="container mt-5 mb-5" id="timeline-discourse">
-    <div class="row">
+<div class="container mt-5 mb-5">
+    <div class="row" id="timeline-discourse">
         <div class="col-md-6 offset-md-3" v-if='comments' v-cloak>
             <h1 style="text-align: center;"> Sphere:
                 <span class="badge badge-pill badge-primary">[[ topic.main_sphere_of_topic ]]</span>
@@ -27,7 +28,8 @@
                 <li v-for="comment in comments.keys()">
                     <a target="_blank" v-bind:href="[[ comments[comment].author_prof_url ]]"><b>[[ comments[comment].author ]]</b></a>
                     <a href="#" class="float-right">[[ comments[comment].timestamp ]]</a>
-                    <p id='text_of_comments'>[[ comments[comment].text ]]</p>
+                    
+                    <p id='text_of_comments' v-html='comments[comment].text'></p>
 
                     {% if request.user.is_authenticated %}
                     <div id='like-possibility'>
@@ -48,10 +50,18 @@
             <div id='sep'>
                 <hr>
             </div>
+    </div>
+    <div v-else id='loader'></div>
+        </div>
+        <div style="text-align: center, margin-left:15%;">
+            
             <div id='comment-field'>
-                <form id='send_comment_form' method="post" @submit.prevent="onSubmit">
+                <form id='send_comment_form' method="post">
                     {% csrf_token %}
-                    <textarea class="form-control" name='text' id='text' v-model="text"></textarea>
+                    <!-- <div class="form-control" name='text' id='editor'></div>   -->
+                    {{ form.media }}
+                    {{ form.text | safe}}
+
                     <div id='submit_button'>
                         <input type='submit' id='submit_button' value='Go'class="btn btn-dark">
                     </div>
@@ -59,7 +69,7 @@
             </div>
             {% endif %}
         </div>
-        <div v-else id='loader'></div>
+        </div>
     </div>
 </div>
 
@@ -158,7 +168,17 @@
             },
         }
 
-    })    
+    })
+
+    $(document).ready(function() {
+        $('#send_comment_form').on('submit', function(e){
+            e.preventDefault();
+            var value_of_rich_editor = CKEDITOR.instances['text_comment__'].getData();
+            vm.text = value_of_rich_editor
+            vm.onSubmit()
+            CKEDITOR.instances['text_comment__'].setData() = ''
+            })
+    })
 </script>
 
 {% endblock %}
