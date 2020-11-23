@@ -51,7 +51,7 @@ ul.timeline > li:before {
     display: inline;
 }
 #submit_button{
-    padding-top: 2%;
+    margin-top: 0.9%;
     float:center;
     height: 38px;
 }

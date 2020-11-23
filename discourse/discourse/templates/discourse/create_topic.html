@@ -12,8 +12,12 @@
 
 {% endblock %}
 {% block html %}
+
+<style type="text/css">
+    [v-cloak] {display:none;}
+</style>
 <div id='create_topic_page'>
-    <div class="container">
+    <div class="container" v-cloak>
         <div class="col-md-6 mx-auto text-center">
             <div class="header-title">
                 <h1 class="wv-heading--title">
@@ -27,7 +31,7 @@
             <div class="row">
                 <div class="col-md-4 mx-auto">
                     <div class="myform form ">
-                        <form method="post" id='post_form' @submit.prevent="onSubmit(this)"enctype="multipart/form-data">
+                        <form method="post" id='post_form' @submit.prevent="onSubmit(this)" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="form-group">
                                 <p style="color: red;" v-show='topic_error'>* [[ topic_error ]]</p>
