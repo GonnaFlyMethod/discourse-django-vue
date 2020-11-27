@@ -38,6 +38,18 @@
                                 <p style="color: red;" v-show='second_name_error'>* [[ second_name_error ]]</p>
                                 <input type="text" name="second_name"  class="form-control my-input" id="name" placeholder="Second name" v-model='second_name'>
                             </div>
+
+                            <div class="form-group">
+                                <p style="color: red;" v-show='image_error'>* [[ image_error ]]</p>
+
+                                <label for="file">Set avatar</label>
+                                <input type="file" name="image_of_topic" class="form-control btn btn-dark" id="image_of_topic" placeholder="image_of_topic" v-on:change="file_uploaded" ref='image_of_topic'>
+
+                                <div v-show="user_image_src" style="padding-top: 5%;">
+                                    <img v-bind:src="user_image_src" alt="Image of your topic" class="img-thumbnail">
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <p style="color: red;" v-show='email_error'>* [[ email_error ]]</p>
                                 <input type="email" name="email"  class="form-control my-input" id="email" placeholder="Email" v-model='email'>
@@ -111,6 +123,9 @@
                 password: null,
                 password2: null,
 
+                file: null,
+                user_image_src: null,
+
                 first_name_error:null,
                 second_name_error: null,
                 email_error: null,
@@ -119,6 +134,7 @@
                 sex_error: null,
                 password_error: null,
                 password2_error: null,
+                image_error: null,
 
                 countries_list: null
             }
@@ -128,6 +144,12 @@
             }).then(response => (this.countries_list = response.data))
         },
         methods:{
+            file_uploaded: function(){
+                var file = this.$refs.image_of_topic.files[0];
+                this.file = file
+                var file_url = URL.createObjectURL(file);
+                this.user_image_src = file_url
+            },
             success_way: function(){
                 window.location.replace(success_url);
             },
@@ -177,23 +199,44 @@
                 } else {
                     this.password2_error = null
                 }
+                if ('avatar' in data){
+                    this.image_error = data['avatar'][0]
+                } else{
+                    this.image_error = ''
+                }
 
             },
             onSubmit: function(){
-                var data_load = {
-                    'csrfmiddlewaretoken': '{{ csrf_token }}',
-                    'first_name': this.first_name,
-                    'second_name': this.second_name,
-                    'email': this.email,
-                    'date_of_birth': this.date_of_birth,
-                    'country': this.country,
-                    'sex':this.sex,
-                    'password': this.password,
-                    'password2': this.password2
-                }
-                var self = this
 
-                $.ajax({
+                var self = this;
+                let formData = new FormData();
+
+                formData.append('first_name', this.first_name);
+                formData.append('second_name', this.second_name)
+                formData.append('email', this.email)
+                formData.append('date_of_birth', this.date_of_birth)
+                formData.append('country', this.country)
+                formData.append('sex', this.sex)
+                formData.append('password', this.password)
+                formData.append('password2', this.password2)
+                formData.append('avatar', this.file)
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+                axios.post(reg_user_url,
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                ).then(function(response){
+                    var data = response.data;
+                    if (data['status'] === 'OK'){
+                        self.success_way()
+                    } else{
+                        self.unsuccess_way(data)
+                    }
+                })
+                /*$.ajax({
                     type: "POST",
                     async:false,
                     url: reg_user_url,
@@ -206,7 +249,7 @@
                             self.unsuccess_way(data)
                         }
                     }
-                })
+                })*/
 
             }
         }

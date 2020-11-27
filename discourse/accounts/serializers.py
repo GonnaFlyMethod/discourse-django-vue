@@ -21,8 +21,8 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Account
-		fields = ['first_name', 'second_name', 'email', 'date_of_birth', 'sex',
-		          'country', 'password', 'password2']
+		fields = ['first_name', 'second_name', 'avatar', 'email',
+		          'date_of_birth', 'sex', 'country', 'password', 'password2']
 		extra_kwargs = {
 			'password':{'write_only':True}
 		}
@@ -40,6 +40,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 	def save(self):
 		first_name = self.validated_data['first_name']
 		second_name = self.validated_data['second_name']
+		avatar = self.validated_data['avatar']
 		email = self.validated_data['email']
 		date_of_birth = self.validated_data['date_of_birth']
 		sex = self.validated_data['sex']
@@ -47,6 +48,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 		account = Account(
 			              first_name=first_name,
 			              second_name=second_name,
+			              avatar=avatar,
 			              email=email,
 			              date_of_birth=date_of_birth,
 			              sex=sex,

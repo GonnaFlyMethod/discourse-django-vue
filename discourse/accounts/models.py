@@ -15,6 +15,8 @@ class Country(models.Model):
 class Account(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField("First name", max_length=15)
     second_name = models.CharField("Second name", max_length=15)
+    avatar = models.ImageField('User avatar', null=True, blank=True,
+                                upload_to='accounts/user_avatars')
     email = models.EmailField("E-mail", unique=True)
     date_of_birth = models.DateField("Date of birth")
     sex = models.CharField("Sex", max_length=20)

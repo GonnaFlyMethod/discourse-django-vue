@@ -130,8 +130,12 @@ class UserProfileAPI(APIView):
 		serializer = UserSerializer(usr)
 
 		final_resp = serializer.data
-		for topic in final_resp['topics_created']:
-			
+
+		raw_topics = final_resp['topics_created']
+		for index,topic in enumerate(raw_topics):
+			if not topic['approved']:
+				del final_resp['topics_created'][index]
+
 			topic_id = Topic.objects.get(id=topic['id']).id
 			topic['topic_url'] = reverse('discourse:topic-detail',
 				                         kwargs={'topicID':topic_id,

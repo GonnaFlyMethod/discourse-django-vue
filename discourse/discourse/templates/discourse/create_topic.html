@@ -42,6 +42,7 @@
                             <div class="form-group">
                                 <p style="color: red;" v-show='image_error'>* [[ image_error ]]</p>
 
+                                <label for="file">Upload main picture for the topic</label>
                                 <input type="file" name="image_of_topic" class="form-control btn btn-dark" id="image_of_topic" placeholder="image_of_topic" v-on:change="file_uploaded" ref='image_of_topic'>
 
                                 <div v-show="user_image_src" style="padding-top: 5%;">

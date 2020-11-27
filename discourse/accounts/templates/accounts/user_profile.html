@@ -19,8 +19,9 @@
         <div class="panel panel-white profile-widget">
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="image-container bg2" style="background:url(https://thumbs.dreamstime.com/b/word-discourse-printed-white-paper-macro-118059011.jpg)">  
-                        <img src="https://bootdey.com/img/Content/avatar/avatar6.png" class="avatar" alt="avatar"> 
+                    <div class="image-container bg2" style="background:url(https://thumbs.dreamstime.com/b/word-discourse-printed-white-paper-macro-118059011.jpg)">
+                        <img v-if="user_data.avatar" v-bind:src="user_data.avatar" class="avatar" alt="avatar">
+                        <img v-else src="https://miro.medium.com/max/720/1*W35QUSvGpcLuxPo3SRTH4w.png" class="avatar" alt="avatar"> 
                     </div>
                 </div>
                 <div class="col-sm-12">
@@ -44,7 +45,8 @@
                 <div class="panel panel-white post">
                     <div class="post-heading">
                         <div class="pull-left image">
-                            <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="img-circle avatar" alt="user profile image">
+                            <img v-if="user_data.avatar" v-bind:src="user_data.avatar" class="img-circle avatar" alt="user profile image">
+                            <img v-else src="https://miro.medium.com/max/720/1*W35QUSvGpcLuxPo3SRTH4w.png" class="img-circle avatar" alt="user profile image">
                         </div>
                         <div class="pull-left meta">
                             <div class="title h5">
