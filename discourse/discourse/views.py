@@ -87,8 +87,13 @@ class TopicDetail(APIView):
 		currents_user = request.user
 		topic = Topic.objects.get(id=topicID)
 
-		if not topic.approved and not topic.author == request.user:
-			return HttpResponseBadRequest()
+		if not topic.approved:
+			if currents_user.is_staff:
+				pass
+			elif not topic.author == currents_user:
+				return HttpResponseBadRequest()
+			else:
+				pass
 
 		topic_info = TopicsSerializer(topic)
 		if type_ == 'get':

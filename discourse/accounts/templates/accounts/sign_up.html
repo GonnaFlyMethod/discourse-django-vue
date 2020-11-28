@@ -35,10 +35,9 @@
                             {% csrf_token %}
                             <div class="form-group">
                                 <p style="color: red;" v-show='first_name_error'>* [[ first_name_error ]]</p>
-                                <input type="text" name="first_name"  class="form-control my-input" id="first_name" placeholder="*First name" v-model='first_name'>
+                                <input type="text" name="first_name" class="form-control my-input" id="first_name" placeholder="*First name" v-model='first_name'>
                             </div>
                             <div class="form-group">
-
                                 <p style="color: red;" v-show='second_name_error'>* [[ second_name_error ]]</p>
                                 <input type="text" name="second_name"  class="form-control my-input" id="name" placeholder="*Second name" v-model='second_name'>
                             </div>
@@ -216,14 +215,14 @@
 
                 if (!(this.country)){
                     this.country_error = "This field can't be empty"
+                    return;
                 }
 
                 if (!(this.sex)){
                     this.sex_error = "This field can't be empty"
+                    return;
                 }
 
-
-                return;
 
                 formData.append('first_name', this.first_name);
                 formData.append('second_name', this.second_name)

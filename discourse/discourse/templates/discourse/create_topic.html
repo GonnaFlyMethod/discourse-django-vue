@@ -178,7 +178,14 @@
                 }
 
                 if ('image_of_topic' in problems){
-                    this.image_error = 'Please, upload the main image of your topic'
+                    let problem_img = null;
+                    try{
+                        problem_img = problems['image_of_topic'][0]
+                    } catch(err){
+                        problem_img = "Please, upload the main image of your topic"
+                    }
+
+                    this.image_error = problem_img
                 } if (!('image_of_topic' in problems)){
                     this.image_error = ''
                 }
@@ -203,6 +210,7 @@
                     }
                 ).then(function(response){
                     var data = response.data;
+                    console.log(data)
                     if ('status' in data){
                             if (data['status'] === 'OK'){
                                 self.success_way(data['url_redirect'])
@@ -216,27 +224,6 @@
                 .catch(function(error){
 
                 });
-                /*$.ajax({
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
-                    type: "POST",
-                    async:false,
-                    url: create_topic_url,
-                    data: formData,
-                    dataType: 'json',
-                    success: function(data){
-                        if ('status' in data){
-                            if (data['status'] === 'OK'){
-                                self.success_way(data['url_redirect'])
-                            } else{
-                                self.unsuccess_way(data)
-                            }
-                        } else {
-                            self.unsuccess_way(data)
-                        }
-                    }
-                })*/
             }
         }
 

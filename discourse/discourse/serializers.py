@@ -14,7 +14,6 @@ class TopicsSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field="email", read_only=True)
     tags = serializers.SlugRelatedField(many=True, slug_field="name_of_tag",
     	                                read_only=True)
-    image_of_topic = serializers.ImageField(max_length=None, use_url=True)
     class Meta:
         model = Topic
         fields = '__all__'
