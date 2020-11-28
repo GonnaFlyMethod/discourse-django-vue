@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 from .managers.account_manager import CustomAccountManager
 
+from .models_fields_validators import image_size_limit
 
 class Country(models.Model):
     name = models.CharField("Name of country", max_length=100)
@@ -16,7 +17,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField("First name", max_length=15)
     second_name = models.CharField("Second name", max_length=15)
     avatar = models.ImageField('User avatar', null=True, blank=True,
-                                upload_to='accounts/user_avatars')
+                                upload_to='accounts/user_avatars',
+                                validators=[image_size_limit])
     email = models.EmailField("E-mail", unique=True)
     date_of_birth = models.DateField("Date of birth")
     sex = models.CharField("Sex", max_length=20)

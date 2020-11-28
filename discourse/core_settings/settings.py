@@ -85,6 +85,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 2,
 }
 
+MAX_UPLOAD_SIZE = "2542880"
+
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 

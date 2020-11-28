@@ -4,6 +4,8 @@ from ckeditor.fields import RichTextField
 
 from accounts.models import Account
 
+from .models_fields_validators import image_size_limit
+
 
 class TagOfTopic(models.Model):
 	name_of_tag = models.CharField(max_length=200)
@@ -26,7 +28,8 @@ class Topic(models.Model):
 		                               blank=True)
 	approved = models.BooleanField(default=False)
 	image_of_topic = models.ImageField('Topic image', null=True, blank=True,
-										upload_to='discourse/topic_images')
+										upload_to='discourse/topic_images',
+										validators=[image_size_limit])
 	image_url = models.CharField(max_length=1000, blank=True, null=True)
 	timestamp = models.DateTimeField(auto_now_add=True)
 

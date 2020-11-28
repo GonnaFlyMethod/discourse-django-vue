@@ -14,7 +14,7 @@
 
 {% block html %}
 <div id='sign_up_page'>
-    <div class="container">
+    <div class="container" v-cloak>
         <div class="col-md-6 mx-auto text-center">
             <div class="header-title">
                 <h1 class="wv-heading--title">
@@ -28,40 +28,43 @@
             <div class="row">
                 <div class="col-md-4 mx-auto">
                     <div class="myform form ">
+                        <div class="alert alert-info" role="alert">
+                            The fields that have '*' mark are must be filled
+                        </div>
                         <form method="post" id='post_form' @submit.prevent="onSubmit">
                             {% csrf_token %}
                             <div class="form-group">
                                 <p style="color: red;" v-show='first_name_error'>* [[ first_name_error ]]</p>
-                                <input type="text" name="first_name"  class="form-control my-input" id="first_name" placeholder="First name" v-model='first_name'>
+                                <input type="text" name="first_name"  class="form-control my-input" id="first_name" placeholder="*First name" v-model='first_name'>
                             </div>
                             <div class="form-group">
+
                                 <p style="color: red;" v-show='second_name_error'>* [[ second_name_error ]]</p>
-                                <input type="text" name="second_name"  class="form-control my-input" id="name" placeholder="Second name" v-model='second_name'>
+                                <input type="text" name="second_name"  class="form-control my-input" id="name" placeholder="*Second name" v-model='second_name'>
                             </div>
-
                             <div class="form-group">
-                                <p style="color: red;" v-show='image_error'>* [[ image_error ]]</p>
-
                                 <label for="file">Set avatar</label>
+
+                                <p style="color: red;" v-show='image_error'>* [[ image_error ]]</p>
                                 <input type="file" name="image_of_topic" class="form-control btn btn-dark" id="image_of_topic" placeholder="image_of_topic" v-on:change="file_uploaded" ref='image_of_topic'>
 
                                 <div v-show="user_image_src" style="padding-top: 5%;">
                                     <img v-bind:src="user_image_src" alt="Image of your topic" class="img-thumbnail">
                                 </div>
                             </div>
-
+                            <hr>
                             <div class="form-group">
                                 <p style="color: red;" v-show='email_error'>* [[ email_error ]]</p>
-                                <input type="email" name="email"  class="form-control my-input" id="email" placeholder="Email" v-model='email'>
+                                <input type="email" name="email"  class="form-control my-input" id="email" placeholder="*Email" v-model='email'>
                             </div>
                             <div class="form-group">
                                 <p style="color: red;" v-show='date_of_birth_error'>* [[ date_of_birth_error ]]</p>
-                                <input type="date" id="date" name="date_of_birth" class="form-control my-input" placeholder="Date of birth" v-model='date_of_birth'>
+                                <input type="date" id="date" name="date_of_birth" class="form-control my-input" placeholder="*Date of birth" v-model='date_of_birth'>
                             </div>
                             <div class="form-group">
                                 <p style="color: red;" v-show='country_error'>* [[ country_error ]]</p>
                                 <select name="country" class="form-control my-input" id="country_list_select" placeholder="Country" v-model='country'>
-                                    <option value="H" disabled selected> Choose the country where are you from</option>
+                                    <option disabled selected> Choose the country where are you from</option>
                                     <option v-for="country in countries_list" id='countries_list' v-cloak> [[ country.name ]]
                                     </option>
                                 </select>
@@ -69,7 +72,7 @@
                             <div class="form-group">
                                 <p style="color: red;" v-show='sex_error'>* [[ sex_error ]]</p>
                                 <select name="sex" class="form-control my-input" id="sex_select" v-model='sex'>
-                                    <option value="" disabled selected>Choose your sex</option>
+                                    <option value="" disabled selected>*Choose your sex</option>
                                     <option id='male_sex_select'> Male </option>
                                     <option id='female_sex_select'> Female </option>
                                     <option id='other_sex_select'> Other </option>
@@ -77,11 +80,11 @@
                             </div>
                             <div class="form-group">
                                 <p style="color: red;" v-show='password_error'>* [[ password_error ]]</p>
-                                <input type="password" placeholder="Password" class="form-control my-input" name="password" v-model='password'>
+                                <input type="password" placeholder="*Password" class="form-control my-input" name="password" v-model='password'>
                             </div>
                             <div class="form-group">
                                 <p style="color: red;" v-show='password2_error'>* [[ password2_error ]]</p>
-                                <input type="password" placeholder="Confirm password" class="form-control my-input" name="password2" v-model='password2'>
+                                <input type="password" placeholder="*Confirm password" class="form-control my-input" name="password2" v-model='password2'>
                             </div>
                             <div class="text-center ">
                                 <input type="submit" class=" btn btn-block send-button tx-tfm" name="Sign Up">
@@ -211,6 +214,17 @@
                 var self = this;
                 let formData = new FormData();
 
+                if (!(this.country)){
+                    this.country_error = "This field can't be empty"
+                }
+
+                if (!(this.sex)){
+                    this.sex_error = "This field can't be empty"
+                }
+
+
+                return;
+
                 formData.append('first_name', this.first_name);
                 formData.append('second_name', this.second_name)
                 formData.append('email', this.email)
@@ -230,27 +244,13 @@
                     }
                 ).then(function(response){
                     var data = response.data;
+                    console.log(data)
                     if (data['status'] === 'OK'){
                         self.success_way()
                     } else{
                         self.unsuccess_way(data)
                     }
                 })
-                /*$.ajax({
-                    type: "POST",
-                    async:false,
-                    url: reg_user_url,
-                    data: data_load,
-                    dataType: 'json',
-                    success: function(data){
-                        if (data['status'] === 'OK'){
-                            self.success_way()
-                        } else{
-                            self.unsuccess_way(data)
-                        }
-                    }
-                })*/
-
             }
         }
     });
